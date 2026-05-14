@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>My Personal Task List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div id="page-login" class="page active">
+    <div class="dis-kutu">
+
+      <div class="login-register-kutu">
+        <div id="btn"></div>
+        <button class="toogle-btn" onclick="showLogin()">Log In</button>
+        <button class="toogle-btn" onclick="showRegister()">Register</button>
+      </div>
+
+      <div class="forms-wrapper">
+
+        <!-- Login Form -->
+        <div class="form active" id="LogIn">
+          <input type="text" class="input-field" id="giriskullanici" placeholder="👤 Username" autocomplete="username">
+          <input type="password" class="input-field" id="girissifre" placeholder="🔒 Password" autocomplete="current-password">
+          <div class="sifre-row">
+            <input type="checkbox" id="sifreToggle">
+            <label for="sifreToggle" class="sifre-label">Show Password</label>
+          </div>
+          <button type="button" class="submit-btn" id="loginBtn" onclick="veriGirisYap()">LOG IN</button>
+          <div id="loginError" class="error-message"></div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form" id="Register">
+          <input type="text" class="input-field" id="kayitkullanici" placeholder="👤 Username" autocomplete="username">
+          <input type="password" class="input-field" id="kayitsifre" placeholder="🔒 Enter Password" autocomplete="new-password">
+          <input type="email" class="input-field" id="kayitmail" placeholder="✉ Email Address">
+          <div class="checkbox-row">
+            <input type="checkbox" id="termsCheck">
+            <label for="termsCheck">I Agree</label>
+          </div>
+          <button type="button" class="submit-btn" id="registerBtn" onclick="veriKayitOl()">REGISTER</button>
+          <div id="registerError" class="error-message"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN PAGE ===== -->
+  <div id="page-anasayfa" class="page">
+    <div class="menu">
+      <h1>My Personal Task List</h1>
+      <div class="welcome-section">
+        <span id="userWelcome"></span>
+        <button class="logout-btn" id="logoutBtn">Log Out</button>
+      </div>
+      <div id="task-form-wrapper">
+        <form id="task-form" onsubmit="taskEkle(event)">
+          <input type="text" id="input-text" placeholder="Add New Task.." required>
+          <button type="submit">Add</button>
+        </form>
+      </div>
+      <ul id="list"></ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
