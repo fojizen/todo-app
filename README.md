@@ -32,7 +32,7 @@ A sleek, interactive To-Do List application featuring a modern "Moody" design, p
 ## 🔧 Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/fojizen/todo-app.git](https://github.com/fojizen/todo-app.git)
+   git clone https://github.com/fojizen/todo-app.git
 
 2. ## 🔗 Live Demo
 You can view the live version of this portfolio here: 
