@@ -11,8 +11,10 @@ A sleek, interactive To-Do List application featuring a modern "Moody" design, p
 ## 📸 Preview
 
 <p align="center">
-  <img src="./display.png" width="800"/>
-   <img src=".login.png" width="800"/>
+   <img src="./login.png" width="800"/>
+</p>
+<p align="center">
+   <img src="./display.png" width="800"/>
 </p>
 
 ## 🛠️ Built With
