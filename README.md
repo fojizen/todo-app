@@ -8,6 +8,12 @@ A sleek, interactive To-Do List application featuring a modern "Moody" design, p
 * **Visual Aesthetics:** Neon glow effects, smooth transitions, and dynamic particle background.
 * **Responsive Design:** Optimized for both desktop and mobile devices.
 * **Interactive UI:** Custom cursor effects and "Glitch" animations.
+## 📸 Preview
+
+<p align="center">
+  <img src="./display.png" width="800"/>
+   <img src=".login.png" width="800"/>
+</p>
 
 ## 🛠️ Built With
 * **HTML5** - Structural foundation.
