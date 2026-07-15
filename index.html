@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark" class="loading">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Modern, guvenli ve estetik bir Todo uygulamasi.">
+  <meta name="theme-color" content="#7c5cff" media="(prefers-color-scheme:dark)">
+  <meta name="theme-color" content="#7c5cff" media="(prefers-color-scheme:light)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta property="og:title" content="Todo App - Gorev Yonetimi">
+  <meta property="og:description" content="Modern, guvenli ve estetik bir Todo uygulamasi.">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <title>Todo App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ═══════════ LANDING PAGE ═══════════ -->
+  <div id="landingPage" class="page active">
+    <nav class="lp-nav">
+      <div class="lp-nav-inner">
+        <a href="#" class="lp-logo" aria-label="Todo App">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <span class="lp-logo-text">TodoApp</span>
+        </a>
+        <div class="lp-nav-links">
+          <a href="#features" class="lp-nav-link" data-lang-key="nav.features">Ozellikler</a>
+          <a href="#how" class="lp-nav-link" data-lang-key="nav.how">Nasil Calisir</a>
+          <a href="#tech" class="lp-nav-link" data-lang-key="nav.tech">Teknoloji</a>
+        </div>
+        <div class="lp-nav-actions">
+          <button class="btn btn-ghost lang-toggle">EN</button>
+          <div class="lp-auth-btns" id="lpAuthBtns">
+            <button class="btn btn-ghost lp-login-btn" data-lang-key="nav.login">Giris Yap</button>
+            <button class="btn btn-primary lp-register-btn" data-lang-key="nav.register">Kayit Ol</button>
+          </div>
+          <div class="lp-user-menu" id="lpUserMenu" style="display:none">
+            <button class="lp-user-btn" id="lpUserBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="lpUsername"></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="lp-user-dropdown" id="lpUserDropdown">
+              <button class="lp-dropdown-item" id="lpGoApp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <span data-lang-key="nav.gotasks">Gorevlerim</span>
+              </button>
+              <button class="lp-dropdown-item lp-dropdown-danger" id="lpLogout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span data-lang-key="main.logout">Cikis</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="lp-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+
+    <section class="lp-hero">
+      <div class="lp-hero-bg">
+        <div class="lp-gradient-orb lp-orb-1"></div>
+        <div class="lp-gradient-orb lp-orb-2"></div>
+        <div class="lp-gradient-orb lp-orb-3"></div>
+      </div>
+      <div class="lp-hero-inner">
+      <div class="lp-hero-content">
+        <div class="lp-badge scroll-reveal">
+          <span class="lp-badge-dot"></span>
+          <span data-lang-key="hero.badge">Gorevlerini Duzene Koyma Zamani</span>
+        </div>
+        <h1 class="lp-hero-title scroll-reveal" data-lang-key="hero.title">
+          Yapman gereken her sey,<br><span class="lp-gradient-text">tek bir yerde.</span>
+        </h1>
+        <p class="lp-hero-sub scroll-reveal" data-lang-key="hero.sub">
+          Gorevlerini olustur, onceliklendir, kategorilere ayir ve tamamla.<br>Guvenli, hizli ve muhtesem gorunen bir todo deneyimi.
+        </p>
+        <div class="lp-hero-actions scroll-reveal">
+          <button class="btn btn-primary btn-lg lp-cta-main">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            <span id="heroCtaText" data-lang-key="hero.cta">Hemen Basla</span>
+          </button>
+          <a href="#features" class="btn btn-secondary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span data-lang-key="hero.more">Daha Fazla</span>
+          </a>
+        </div>
+        <div class="lp-hero-stats scroll-reveal">
+          <div class="lp-hero-stat">
+            <span class="lp-hero-stat-val" data-count="100">0</span><span class="lp-hero-stat-suffix">%</span>
+            <span class="lp-hero-stat-lbl" data-lang-key="hero.stat.free">Ucretsiz</span>
+          </div>
+          <div class="lp-hero-stat-divider"></div>
+          <div class="lp-hero-stat">
+            <span class="lp-hero-stat-val" data-count="7">0</span><span class="lp-hero-stat-suffix">/24</span>
+            <span class="lp-hero-stat-lbl" data-lang-key="hero.stat.access">Erisim</span>
+          </div>
+          <div class="lp-hero-stat-divider"></div>
+          <div class="lp-hero-stat">
+            <span class="lp-hero-stat-val" data-count="256">0</span><span class="lp-hero-stat-suffix">bit</span>
+            <span class="lp-hero-stat-lbl" data-lang-key="hero.stat.encrypt">Sifreleme</span>
+          </div>
+        </div>
+      </div>
+      <div class="lp-hero-visual scroll-reveal">
+        <div class="lp-mockup">
+          <div class="lp-mockup-bar">
+            <span class="lp-mockup-dot" style="background:#ef4444"></span>
+            <span class="lp-mockup-dot" style="background:#f59e0b"></span>
+            <span class="lp-mockup-dot" style="background:#10b981"></span>
+            <span class="lp-mockup-title">Todo App</span>
+          </div>
+          <div class="lp-mockup-body">
+            <div class="lp-mock-task lp-mock-fade" style="--d:0"><span class="lp-mock-check done"></span><span class="lp-mock-text" data-lang-key="mock.t1">Proje dokumani hazirla</span><span class="lp-mock-tag high" data-lang-key="prio.high">Yuksek</span></div>
+            <div class="lp-mock-task lp-mock-fade" style="--d:1"><span class="lp-mock-check done"></span><span class="lp-mock-text" data-lang-key="mock.t2">API endpoint'lerini test et</span><span class="lp-mock-tag high" data-lang-key="prio.high">Yuksek</span></div>
+            <div class="lp-mock-task lp-mock-fade" style="--d:2"><span class="lp-mock-check"></span><span class="lp-mock-text" data-lang-key="mock.t3">Database migration yaz</span><span class="lp-mock-tag medium" data-lang-key="prio.medium">Orta</span></div>
+            <div class="lp-mock-task lp-mock-fade" style="--d:3"><span class="lp-mock-check"></span><span class="lp-mock-text" data-lang-key="mock.t4">Login sayfasini tasarla</span><span class="lp-mock-tag medium" data-lang-key="prio.medium">Orta</span></div>
+            <div class="lp-mock-task lp-mock-fade" style="--d:4"><span class="lp-mock-check"></span><span class="lp-mock-text" data-lang-key="mock.t5">Birim testlerini yaz</span><span class="lp-mock-tag low" data-lang-key="prio.low">Dusuk</span></div>
+          </div>
+          <div class="lp-mockup-float lp-float-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span data-lang-key="mock.done">3 tamamlandi</span></div>
+          <div class="lp-mockup-float lp-float-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-lang-key="mock.upd">2 guncel</span></div>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="lp-section lp-features" id="features">
+      <div class="lp-container">
+        <div class="lp-section-header scroll-reveal">
+          <span class="lp-section-tag" data-lang-key="feat.tag">Ozellikler</span>
+          <h2 class="lp-section-title" data-lang-key="feat.title">Gorev yonetimini<br><span class="lp-gradient-text">bir ust seviyeye tasi.</span></h2>
+          <p class="lp-section-sub" data-lang-key="feat.sub">Gucunu ve basitligini bir arada sunan araclar.</p>
+        </div>
+        <div class="lp-features-grid">
+          <div class="lp-feature-card scroll-reveal" style="--d:0">
+            <div class="lp-feature-icon" style="--accent:var(--accent)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+            <h3 data-lang-key="feat.1.title">Hizli Gorev Ekleme</h3>
+            <p data-lang-key="feat.1.desc">Bir tikla gorev olustur. Oncelik, tarih, kategori ve etiket ekleyerek detaylandir.</p>
+          </div>
+          <div class="lp-feature-card scroll-reveal" style="--d:1">
+            <div class="lp-feature-icon" style="--accent:var(--cyan)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <h3 data-lang-key="feat.2.title">Akilci Filtreleme</h3>
+            <p data-lang-key="feat.2.desc">Duruma gore, oncelige gore, kategoriye gore veya serbest metin ile ara.</p>
+          </div>
+          <div class="lp-feature-card scroll-reveal" style="--d:2">
+            <div class="lp-feature-icon" style="--accent:var(--green)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <h3 data-lang-key="feat.3.title">Surukle & Birak</h3>
+            <p data-lang-key="feat.3.desc">Gorevleri istedigin siraya tasi. Siparisi kendin belirle.</p>
+          </div>
+          <div class="lp-feature-card scroll-reveal" style="--d:3">
+            <div class="lp-feature-icon" style="--accent:var(--orange)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3 data-lang-key="feat.4.title">Guvenlik</h3>
+            <p data-lang-key="feat.4.desc">bcrypt sifreleme, JWT token, brute force korumasi ve rate limiting.</p>
+          </div>
+          <div class="lp-feature-card scroll-reveal" style="--d:4">
+            <div class="lp-feature-icon" style="--accent:var(--red)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+            <h3 data-lang-key="feat.5.title">Tema Degisimi</h3>
+            <p data-lang-key="feat.5.desc">Koyu, acik ve sistem temasi. Goz yormayan, estetik renk paletleri.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-section lp-how" id="how">
+      <div class="lp-container">
+        <div class="lp-section-header scroll-reveal">
+          <span class="lp-section-tag" data-lang-key="how.tag">Nasil Calisir</span>
+          <h2 class="lp-section-title" data-lang-key="how.title">Uc adimda<br><span class="lp-gradient-text">basla.</span></h2>
+        </div>
+        <div class="lp-steps">
+          <div class="lp-step scroll-reveal" style="--d:0">
+            <div class="lp-step-num">01</div>
+            <div class="lp-step-content">
+              <h3 data-lang-key="how.1.title">Hesap Olustur</h3>
+              <p data-lang-key="how.1.desc">Kullanici adin, e-posta ve sifren ile hizlica kayit ol.</p>
+            </div>
+            <div class="lp-step-line"></div>
+          </div>
+          <div class="lp-step scroll-reveal" style="--d:1">
+            <div class="lp-step-num">02</div>
+            <div class="lp-step-content">
+              <h3 data-lang-key="how.2.title">Gorevlerini Ekle</h3>
+              <p data-lang-key="how.2.desc">Oncelik, tarih, kategori ve etiket secenekleriyle gorevlerini detaylandir.</p>
+            </div>
+            <div class="lp-step-line"></div>
+          </div>
+          <div class="lp-step scroll-reveal" style="--d:2">
+            <div class="lp-step-num">03</div>
+            <div class="lp-step-content">
+              <h3 data-lang-key="how.3.title">Tamamla ve Takip Et</h3>
+              <p data-lang-key="how.3.desc">Gorevlerini isaretle, istatistiklerini gor, surekli kendini gelistir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-section lp-tech" id="tech">
+      <div class="lp-container">
+        <div class="lp-section-header scroll-reveal">
+          <span class="lp-section-tag" data-lang-key="tech.tag">Teknoloji</span>
+          <h2 class="lp-section-title" data-lang-key="tech.title">Modern,<br><span class="lp-gradient-text">hafif, guclu.</span></h2>
+          <p class="lp-section-sub" data-lang-key="tech.sub">Agir framework'ler yok. Sadece iyi yazilmis, anlasilabilir kod.</p>
+        </div>
+        <div class="lp-tech-grid">
+          <div class="lp-code-window scroll-reveal">
+            <div class="lp-code-bar">
+              <span class="lp-mockdot" style="background:#ef4444"></span>
+              <span class="lp-mockdot" style="background:#f59e0b"></span>
+              <span class="lp-mockdot" style="background:#10b981"></span>
+              <span class="lp-code-filename">server.js</span>
+            </div>
+            <pre class="lp-code"><code><span class="lp-kw">const</span> express = <span class="lp-fn">require</span>(<span class="lp-str">'express'</span>);
+<span class="lp-kw">const</span> bcrypt = <span class="lp-fn">require</span>(<span class="lp-str">'bcryptjs'</span>);
+
+<span class="lp-kw">app</span>.<span class="lp-fn">post</span>(<span class="lp-str">'/api/login'</span>, <span class="lp-kw">async</span> (req, res) => {
+  <span class="lp-kw">const</span> { username, password } = req.body;
+  <span class="lp-kw">const</span> user = <span class="lp-kw">await</span> db.<span class="lp-fn">getOne</span>(<span class="lp-str">'SELECT * FROM users WHERE username = ?'</span>, [username]);
+  <span class="lp-kw">const</span> valid = <span class="lp-kw">await</span> bcrypt.<span class="lp-fn">compare</span>(password, user.passwordHash);
+  <span class="lp-kw">if</span> (!valid) <span class="lp-kw">return</span> res.<span class="lp-fn">status</span>(<span class="lp-num">401</span>).<span class="lp-fn">json</span>({ error: <span class="lp-str">'Gecersiz giris'</span> });
+  <span class="lp-kw">const</span> token = jwt.<span class="lp-fn">sign</span>({ userId: user.id }, JWT_SECRET, { expiresIn: <span class="lp-str">'7d'</span> });
+  res.<span class="lp-fn">json</span>({ token, username: user.username });
+});</code></pre>
+          </div>
+          <div class="lp-tech-stack scroll-reveal" style="--d:1">
+            <div class="lp-tech-item"><div class="lp-tech-icon">JS</div><div><strong>Vanilla JavaScript</strong><span data-lang-key="tech.1">Framework yok, saf performans</span></div></div>
+            <div class="lp-tech-item"><div class="lp-tech-icon lp-icon-express">Ex</div><div><strong>Express.js</strong><span data-lang-key="tech.2">Hafif, hizli backend</span></div></div>
+            <div class="lp-tech-item"><div class="lp-tech-icon lp-icon-sqlite">SL</div><div><strong>SQLite (sql.js)</strong><span data-lang-key="tech.3">Harici DB gerektirmez</span></div></div>
+            <div class="lp-tech-item"><div class="lp-tech-icon lp-icon-jwt">JT</div><div><strong>JWT + bcrypt</strong><span data-lang-key="tech.4">Guvenli kimlik dogrulama</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-section lp-cta-section">
+      <div class="lp-container">
+        <div class="lp-cta-box scroll-reveal">
+          <div class="lp-cta-glow"></div>
+          <h2 id="ctaTitle" data-lang-key="cta.title">Gorevlerine basla,<br><span class="lp-gradient-text">bugun.</span></h2>
+          <p id="ctaSub" data-lang-key="cta.sub">Ucretsiz kayit ol, hemen gorevlerini yonetmeye basla.</p>
+          <button id="ctaBtn" class="btn btn-primary btn-lg lp-cta-final">
+            <span id="ctaBtnText" data-lang-key="cta.btn">Hemen Kayit Ol</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="lp-footer">
+      <div class="lp-container lp-footer-inner">
+        <div class="lp-footer-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Todo App
+        </div>
+        <div class="lp-footer-right"><span data-lang-key="footer.built">Vanilla JS ile yapildi</span></div>
+      </div>
+      <div class="lp-footer-copy" data-lang-key="footer.copyright">&copy; 2026 fojizen. Tum haklari saklidir.</div>
+    </footer>
+  </div>
+
+  <!-- ═══════════ LOGIN PAGE ═══════════ -->
+  <div id="loginPage" class="page">
+    <div class="auth-bg">
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+      <div class="auth-orb auth-orb-3"></div>
+      <div class="auth-grid"></div>
+      <div class="auth-code auth-code-1"><span class="ac-kw">const</span> user = <span class="ac-kw">await</span> db.<span class="ac-fn">find</span>(<span class="ac-str">'admin'</span>);</div>
+      <div class="auth-code auth-code-2"><span class="ac-kw">if</span> (token) res.<span class="ac-fn">json</span>({ ok: <span class="ac-num">true</span> });</div>
+      <div class="auth-code auth-code-3"><span class="ac-kw">export</span> <span class="ac-kw">default</span> <span class="ac-fn">TodoApp</span>();</div>
+      <div class="auth-code auth-code-4">bcrypt.<span class="ac-fn">hash</span>(pw, <span class="ac-num">12</span>);</div>
+      <div class="auth-code auth-code-5">jwt.<span class="ac-fn">sign</span>({ id }, SECRET);</div>
+      <div class="auth-code auth-code-6"><span class="ac-kw">async</span> <span class="ac-kw">function</span> <span class="ac-fn">login</span>() {}</div>
+    </div>
+    <a href="#" class="auth-back" id="authBackBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <span data-lang-key="auth.back">Anasayfa</span>
+    </a>
+    <button class="btn btn-ghost lang-toggle auth-lang">EN</button>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <h1>Todo App</h1>
+          <p data-lang-key="auth.subtitle">Gorevlerini yonet, organize ol</p>
+        </div>
+        <div class="auth-tabs">
+          <button id="loginTab" class="auth-tab active" data-lang-key="auth.tab.login">Giris Yap</button>
+          <button id="registerTab" class="auth-tab" data-lang-key="auth.tab.register">Kayit Ol</button>
+        </div>
+        <form id="loginForm" class="auth-form active">
+          <div class="form-group">
+            <label data-lang-key="auth.login.user">Kullanici Adi</label>
+            <input type="text" id="loginUsername" autocomplete="username" data-lang-placeholder="auth.login.user.ph" placeholder="Kullanici adiniz" required>
+          </div>
+          <div class="form-group">
+            <label data-lang-key="auth.login.pw">Sifre</label>
+            <div class="input-icon-wrap">
+              <input type="password" id="loginPassword" autocomplete="current-password" data-lang-placeholder="auth.login.pw.ph" placeholder="Sifreniz" required>
+              <button type="button" class="toggle-pw" data-lang-aria="auth.login.pw.aria" aria-label="Sifreyi goster/gizle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="loginBtn" data-lang-key="auth.login.btn">Giris Yap</button>
+          <div id="loginError" class="form-msg error"></div>
+        </form>
+        <form id="registerForm" class="auth-form">
+          <div class="form-group">
+            <label data-lang-key="auth.reg.user">Kullanici Adi</label>
+            <input type="text" id="regUsername" autocomplete="username" data-lang-placeholder="auth.reg.user.ph" placeholder="Kullanici adi (3-20 karakter)" required minlength="3" maxlength="20">
+            <span id="regUsernameStatus" class="form-hint"></span>
+          </div>
+          <div class="form-group">
+            <label data-lang-key="auth.reg.email">E-posta</label>
+            <input type="email" id="regEmail" autocomplete="email" placeholder="ornek@email.com" required>
+          </div>
+          <div class="form-group">
+            <label data-lang-key="auth.reg.pw">Sifre</label>
+            <div class="input-icon-wrap">
+              <input type="password" id="regPassword" autocomplete="new-password" data-lang-placeholder="auth.reg.pw.ph" placeholder="En az 6 karakter" required minlength="6">
+              <button type="button" class="toggle-pw" aria-label="Sifreyi goster/gizle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="termsCheck" required>
+            <label for="termsCheck" data-lang-key="auth.reg.terms">Kullanim sartlarini kabul ediyorum</label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="registerBtn" data-lang-key="auth.reg.btn">Kayit Ol</button>
+          <div id="registerError" class="form-msg error"></div>
+        </form>
+      </div>
+    </div>
+    <div class="auth-footer-copy" data-lang-key="footer.copyright">&copy; 2026 fojizen. Tum haklari saklidir.</div>
+  </div>
+
+  <!-- ═══════════ MAIN PAGE ═══════════ -->
+  <div id="mainPage" class="page">
+    <header class="app-header">
+      <div class="header-left">
+        <button id="homeBtn" class="btn btn-ghost btn-sm" title="Anasayfa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span data-lang-key="nav.home">Anasayfa</span>
+        </button>
+        <h1 data-lang-key="main.title">Gorevlerim</h1>
+        <span id="userWelcome" class="welcome-text"></span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-ghost lang-toggle">EN</button>
+        <button id="themeToggle" class="btn-icon" aria-label="Tema degistir" title="Tema degistir">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+        <button id="adminBtn" class="btn btn-accent" style="display:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span data-lang-key="main.admin">Admin</span>
+        </button>
+        <button id="logoutBtn" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-lang-key="main.logout">Cikis</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <form id="taskForm" class="task-form">
+        <div class="task-input-row">
+          <input type="text" id="taskInput" data-lang-placeholder="main.task.ph" placeholder="Yeni gorev ekle... (Ctrl+K)" autocomplete="off" required>
+          <button type="submit" class="btn btn-primary btn-add">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span data-lang-key="main.task.add">Ekle</span>
+          </button>
+        </div>
+        <div class="task-extras" id="taskExtras">
+          <div class="extra-field">
+            <label data-lang-key="main.task.prio">Oncelik</label>
+            <div class="custom-select-wrap">
+              <select id="taskPriority" data-lang-options="task.priority">
+                <option value="low">Dusuk</option>
+                <option value="medium" selected>Orta</option>
+                <option value="high">Yuksek</option>
+              </select>
+            </div>
+          </div>
+          <div class="extra-field">
+            <label data-lang-key="main.task.date">Bitis Tarihi</label>
+            <div class="custom-input-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <input type="date" id="taskDueDate">
+            </div>
+          </div>
+          <div class="extra-field">
+            <label data-lang-key="main.task.cat">Kategori</label>
+            <div class="custom-select-wrap">
+              <select id="taskCategory" data-lang-options="task.category">
+                <option value="">Yok</option>
+                <option value="Is">Is</option>
+                <option value="Kisisel">Kisisel</option>
+                <option value="Alisveris">Alisveris</option>
+                <option value="Saglik">Saglik</option>
+                <option value="Egitim">Egitim</option>
+              </select>
+            </div>
+          </div>
+          <div class="extra-field">
+            <label data-lang-key="main.task.tags">Etiketler</label>
+            <div class="custom-input-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              <input type="text" id="taskTags" data-lang-placeholder="main.task.tags.ph" placeholder="etiket1, etiket2">
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-ghost btn-toggle-extras" id="toggleExtras">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <span data-lang-key="main.task.advanced">Gelismis secenekler</span>
+        </button>
+      </form>
+
+      <div class="toolbar">
+        <div class="custom-select-wrap"><select id="filterStatus" data-lang-options="filter.status"></select></div>
+        <div class="custom-select-wrap"><select id="filterPriority" data-lang-options="filter.priority"></select></div>
+        <div class="custom-select-wrap"><select id="filterCategory"></select></div>
+        <div class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" data-lang-placeholder="filter.search.ph" placeholder="Ara..." autocomplete="off">
+        </div>
+        <select id="sortSelect" data-lang-options="sort.select"></select>
+      </div>
+
+      <section class="task-section">
+        <ul id="taskList" class="task-list" role="list"></ul>
+        <div id="emptyState" class="empty-state">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L24 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <h2 data-lang-key="empty.title">Henuz gorev yok</h2>
+          <p data-lang-key="empty.desc">Yukaridan yeni bir gorev ekleyerek basla</p>
+        </div>
+      </section>
+
+      <footer class="stats-bar">
+        <div class="stat"><span id="statTotal" class="stat-val">0</span><span class="stat-lbl" data-lang-key="stats.total">Toplam</span></div>
+        <div class="stat"><span id="statActive" class="stat-val">0</span><span class="stat-lbl" data-lang-key="stats.active">Aktif</span></div>
+        <div class="stat"><span id="statDone" class="stat-val">0</span><span class="stat-lbl" data-lang-key="stats.done">Tamam</span></div>
+        <div class="stat"><span id="statLate" class="stat-val">0</span><span class="stat-lbl" data-lang-key="stats.late">Gecikmis</span></div>
+        <button id="clearDoneBtn" class="btn btn-ghost btn-sm" data-lang-key="stats.clear">Tamamlananlari Sil</button>
+      </footer>
+    </main>
+    <div class="page-footer-copy" data-lang-key="footer.copyright">&copy; 2026 fojizen. Tum haklari saklidir.</div>
+  </div>
+
+  <!-- ═══════════ ADMIN PAGE ═══════════ -->
+  <div id="adminPage" class="page">
+    <header class="app-header">
+      <div class="header-left">
+        <button id="adminBackBtn" class="btn btn-secondary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span data-lang-key="admin.back">Geri</span>
+        </button>
+        <h1 data-lang-key="admin.title">Kullanici Yonetimi</h1>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-ghost lang-toggle">EN</button>
+        <button id="themeToggleAdmin" class="btn-icon" aria-label="Tema degistir" title="Tema degistir">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+    <main class="app-main">
+      <div class="admin-stats">
+        <div class="stat"><span id="adminTotalUsers" class="stat-val">0</span><span class="stat-lbl" data-lang-key="admin.stat.users">Toplam Kullanici</span></div>
+        <div class="stat"><span id="adminTotalTasks" class="stat-val">0</span><span class="stat-lbl" data-lang-key="admin.stat.tasks">Toplam Gorev</span></div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th data-lang-key="admin.th.user">Kullanici</th>
+              <th data-lang-key="admin.th.email">E-posta</th>
+              <th data-lang-key="admin.th.role">Rol</th>
+              <th data-lang-key="admin.th.status">Durum</th>
+              <th data-lang-key="admin.th.lastLogin">Son Giris</th>
+              <th data-lang-key="admin.th.tasks">Gorev</th>
+              <th data-lang-key="admin.th.actions">Islemler</th>
+            </tr>
+          </thead>
+          <tbody id="adminUserList"></tbody>
+        </table>
+      </div>
+    </main>
+    <div class="page-footer-copy" data-lang-key="footer.copyright">&copy; 2026 fojizen. Tum haklari saklidir.</div>
+  </div>
+
+  <!-- ═══════════ EDIT TASK MODAL ═══════════ -->
+  <dialog id="editModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 data-lang-key="edit.title">Gorev Duzenle</h2>
+        <button class="btn-icon modal-close" aria-label="Kapat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="editForm" class="modal-body">
+        <div class="form-group">
+          <label data-lang-key="edit.text">Gorev</label>
+          <textarea id="editText" rows="3" required></textarea>
+        </div>
+        <div class="edit-grid">
+          <div class="form-group"><label data-lang-key="edit.prio">Oncelik</label><div class="custom-select-wrap"><select id="editPriority" data-lang-options="edit.priority"></select></div></div>
+          <div class="form-group"><label data-lang-key="edit.date">Bitis</label><div class="custom-input-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><input type="date" id="editDueDate"></div></div>
+          <div class="form-group"><label data-lang-key="edit.cat">Kategori</label><div class="custom-select-wrap"><select id="editCategory" data-lang-options="edit.category"></select></div></div>
+          <div class="form-group"><label data-lang-key="edit.tags">Etiketler</label><div class="custom-input-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg><input type="text" id="editTags" data-lang-placeholder="main.task.tags.ph" placeholder="etiket1, etiket2"></div></div>
+        </div>
+        <div class="form-check"><input type="checkbox" id="editDone"><label for="editDone" data-lang-key="edit.done">Tamamlandi</label></div>
+      </form>
+      <div class="modal-foot">
+        <button id="editDeleteBtn" class="btn btn-danger" data-lang-key="edit.delete">Sil</button>
+        <div class="modal-foot-right">
+          <button class="btn btn-secondary modal-close" data-lang-key="edit.cancel">Iptal</button>
+          <button type="submit" form="editForm" class="btn btn-primary" data-lang-key="edit.save">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ═══════════ ADMIN EDIT MODAL ═══════════ -->
+  <dialog id="adminEditModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 data-lang-key="adminEdit.title">Kullanici Duzenle</h2>
+        <button class="btn-icon modal-close" aria-label="Kapat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="adminEditForm" class="modal-body">
+        <input type="hidden" id="adminEditId">
+        <div class="admin-edit-info">
+          <div class="admin-info-row"><span class="admin-info-label" data-lang-key="adminEdit.id">ID</span><span id="adminEditIdDisplay" class="admin-info-value">-</span></div>
+          <div class="admin-info-row"><span class="admin-info-label" data-lang-key="adminEdit.created">Kayit Tarihi</span><span id="adminEditDate" class="admin-info-value">-</span></div>
+          <div class="admin-info-row"><span class="admin-info-label" data-lang-key="adminEdit.lastLogin">Son Giris</span><span id="adminEditLastLogin" class="admin-info-value">-</span></div>
+          <div class="admin-info-row"><span class="admin-info-label" data-lang-key="adminEdit.taskCount">Gorev Sayisi</span><span id="adminEditTaskCount" class="admin-info-value">-</span></div>
+        </div>
+        <div class="form-group">
+          <label data-lang-key="adminEdit.user">Kullanici Adi</label>
+          <input type="text" id="adminEditUsername" required minlength="3" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label data-lang-key="adminEdit.email">E-posta</label>
+          <input type="email" id="adminEditEmail" required>
+        </div>
+        <div class="form-group">
+          <label data-lang-key="adminEdit.pw">Yeni Sifre (bos birakilirsa degismez)</label>
+          <input type="password" id="adminEditPassword" data-lang-placeholder="adminEdit.pw.ph" placeholder="En az 6 karakter">
+        </div>
+        <div class="edit-grid">
+          <div class="form-group">
+            <label data-lang-key="adminEdit.role">Rol</label>
+            <select id="adminEditRole" data-lang-options="adminEdit.role"></select>
+          </div>
+          <div class="form-group">
+            <label data-lang-key="adminEdit.status">Durum</label>
+            <select id="adminEditBanned" data-lang-options="adminEdit.status"></select>
+          </div>
+        </div>
+      </form>
+      <div class="modal-foot">
+        <div></div>
+        <div class="modal-foot-right">
+          <button class="btn btn-secondary modal-close" data-lang-key="adminEdit.cancel">Iptal</button>
+          <button type="submit" form="adminEditForm" class="btn btn-primary" data-lang-key="adminEdit.save">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
