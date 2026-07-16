@@ -151,14 +151,6 @@ node server.js
 
 Sunucu varsayilan olarak `http://localhost:3000` adresinde baslar.
 
-### Varsayilan Giris
-
-| Kullanici | Sifre | Rol |
-|-----------|-------|-----|
-| `admin` | Ortam degiskeninden (`ADMIN_PASSWORD`) | admin |
-
-> Uretim ortaminda varsayilan sifreyi degistirmeyi unutmayin.
-
 ---
 
 ## Proje Yapisi
