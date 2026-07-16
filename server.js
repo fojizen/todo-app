@@ -172,7 +172,7 @@ app.post('/api/login', async (req, res) => {
     if (!valid) { recordFailedLogin(ip); return res.status(401).json({ error: 'Gecersiz giris bilgileri' }); }
 
     clearLoginAttempts(ip);
-    await run('UPDATE users SET lastlogin = NOW() WHERE id = $1', [user.id]);
+    await run('UPDATE users SET lastlogin = NOW()::text WHERE id = $1', [user.id]);
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
     setTokenCookie(res, token);
     res.json({ token, username: user.username, role: user.role });
@@ -198,7 +198,7 @@ app.post('/api/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const result = await run(
-      'INSERT INTO users (username, email, passwordhash, role, createdat) VALUES ($1, $2, $3, $4, NOW()) ON CONFLICT (username) DO NOTHING RETURNING id, username, role',
+      'INSERT INTO users (username, email, passwordhash, role, createdat) VALUES ($1, $2, $3, $4, NOW()::text) ON CONFLICT (username) DO NOTHING RETURNING id, username, role',
       [u, email.trim().toLowerCase(), hash, 'user']
     );
 
@@ -259,7 +259,7 @@ app.post('/api/tasks', auth, async (req, res) => {
     const order = (maxOrder.mx || 0) + 1;
 
     const result = await run(
-      'INSERT INTO tasks (userid, text, done, priority, duedate, category, tags, itemorder, createdat, updatedat) VALUES ($1, $2, 0, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING *',
+      'INSERT INTO tasks (userid, text, done, priority, duedate, category, tags, itemorder, createdat, updatedat) VALUES ($1, $2, false, $3, $4, $5, $6, $7, NOW()::text, NOW()::text) RETURNING *',
       [req.user.id, text.trim(), priority || 'medium', dueDate || null, category || '', JSON.stringify(tags || []), order]
     );
 
@@ -268,7 +268,7 @@ app.post('/api/tasks', auth, async (req, res) => {
     res.json(task);
   } catch (e) {
     console.error('Task create error:', e.stack);
-    res.status(500).json({ error: 'Sunucu hatasi', detail: e.message });
+    res.status(500).json({ error: 'Sunucu hatasi' });
   }
 });
 
@@ -284,7 +284,7 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
     if (text !== undefined && text.trim().length > 500) return res.status(400).json({ error: 'Gorev metni en fazla 500 karakter' });
     if (priority && !['low', 'medium', 'high'].includes(priority)) return res.status(400).json({ error: 'Gecersiz oncelik' });
 
-    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, updatedat = NOW() WHERE id = $7',
+    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, updatedat = NOW()::text WHERE id = $7',
       [
         text !== undefined ? text.trim() : task.text,
         done !== undefined ? (done ? true : false) : task.done,
