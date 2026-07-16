@@ -164,6 +164,8 @@ function adminOnly(req, res, next) {
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_PASS = process.env.GMAIL_PASS;
 
+console.log('GMAIL_USER set:', !!process.env.GMAIL_USER, 'GMAIL_PASS set:', !!process.env.GMAIL_PASS);
+
 const mailTransporter = (GMAIL_USER && GMAIL_PASS) ? nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
