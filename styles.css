@@ -356,6 +356,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .search-wrap svg{color:var(--muted);flex-shrink:0}
 .search-wrap input{border:none;background:transparent;color:var(--text);font-size:.8125rem;width:100%;outline:none}
 .search-wrap input::placeholder{color:var(--muted)}
+.sort-wrap{display:flex;align-items:center;gap:6px;padding:0 12px 0 10px;height:36px;border:1px solid var(--border);border-radius:10px;background:var(--input);transition:all var(--tr);flex-shrink:0}
+.sort-wrap:hover{border-color:var(--border2)}
+.sort-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.12)}
+.sort-wrap svg{color:var(--muted);flex-shrink:0;transition:color var(--tr)}
+.sort-wrap:focus-within svg{color:var(--accent)}
+.sort-wrap select{border:none;background:transparent;color:var(--text);font-size:.8125rem;font-weight:500;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;padding-right:18px;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center}
 
 /* Task List */
 .task-section{flex:1;margin-bottom:16px}
@@ -479,6 +485,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .stats-bar .btn span{display:none}
   .toolbar{gap:6px}
   .toolbar .custom-select-wrap{min-width:0;flex:1}
+  .sort-wrap{flex-shrink:1}
   .admin-table{font-size:.75rem}
   .admin-table th,.admin-table td{padding:8px}
   .edit-grid{grid-template-columns:1fr}
