@@ -279,6 +279,9 @@ app.post('/api/register', async (req, res) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Gecersiz e-posta' });
     if (email.length > 254) return res.status(400).json({ error: 'E-posta cok uzun' });
 
+    const emailCheck = await getOne('SELECT id FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    if (emailCheck) return res.status(409).json({ error: 'Bu e-posta adresi zaten kayitli' });
+
     const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const result = await run(
