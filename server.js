@@ -159,6 +159,79 @@ function adminOnly(req, res, next) {
   next();
 }
 
+// ── Email Verification ─────────────────────────────────
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = process.env.FROM_EMAIL || 'TodoApp <onboarding@resend.dev>';
+
+async function sendVerificationEmail(email, token) {
+  if (!RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not set, skipping verification email');
+    return false;
+  }
+  const verifyUrl = FRONTEND_URL + '/api/verify-email/' + token;
+  const html = '<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px">' +
+    '<div style="text-align:center;margin-bottom:24px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>' +
+    '<h2 style="text-align:center;color:#1a1a2e;margin:0 0 8px">E-postani Dogrula</h2>' +
+    '<p style="text-align:center;color:#6b7280;margin:0 0 24px;font-size:15px">Hesabini aktif etmek icin asagidaki butona tikla.</p>' +
+    '<div style="text-align:center;margin-bottom:24px"><a href="' + verifyUrl + '" style="display:inline-block;padding:12px 32px;background:#7c5cff;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">E-postami Dogrula</a></div>' +
+    '<p style="text-align:center;color:#9ca3af;font-size:13px">Bu e-postayi sen talep etmediysen, gonemseme.</p>' +
+    '</div>';
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: FROM_EMAIL, to: email, subject: 'E-postani Dogrula - TodoApp', html })
+    });
+    if (!resp.ok) {
+      const err = await resp.text();
+      console.error('Resend error:', err);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Email send failed:', e.message);
+    return false;
+  }
+}
+
+app.get('/api/verify-email/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    if (!token) return res.status(400).send('<h2> Gecersiz link</h2>');
+    const user = await getOne('SELECT id FROM users WHERE verificationtoken = $1', [token]);
+    if (!user) return res.status(400).send('<h2>Gecersiz veya kullanilmis dogrulama linki</h2>');
+    await run('UPDATE users SET verified = true, verificationtoken = NULL WHERE id = $1', [user.id]);
+    res.send('<div style="font-family:system-ui,sans-serif;text-align:center;padding:60px 20px">' +
+      '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>' +
+      '<h2 style="color:#1a1a2e">E-posta Dogrulandi!</h2>' +
+      '<p style="color:#6b7280">Simdi <a href="' + FRONTEND_URL + '">giris yapabilirsin</a>.</p></div>');
+  } catch (e) {
+    console.error('Verify error:', e.stack);
+    res.status(500).send('<h2>Sunucu hatasi</h2>');
+  }
+});
+
+app.post('/api/resend-verification', async (req, res) => {
+  try {
+    const { username } = req.body || {};
+    if (!username) return res.status(400).json({ error: 'Kullanici adi gerekli' });
+    if (rateLimit('resend:' + req.ip, 3, 60000)) return res.status(429).json({ error: 'Cok fazla istek. 1 dk bekleyin.' });
+
+    const user = await getOne('SELECT id, email, verified, verificationtoken FROM users WHERE username = $1', [username.trim().toLowerCase()]);
+    if (!user) return res.status(404).json({ error: 'Kullanici bulunamadi' });
+    if (user.verified) return res.status(400).json({ error: 'E-posta zaten dogrulanmis' });
+
+    const newToken = crypto.randomBytes(32).toString('hex');
+    await run('UPDATE users SET verificationtoken = $1 WHERE id = $2', [newToken, user.id]);
+    const sent = await sendVerificationEmail(user.email, newToken);
+    if (!sent) return res.status(500).json({ error: 'E-posta gonderilemedi' });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Resend verification error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
 // ── Auth Routes ─────────────────────────────────────────
 app.post('/api/login', async (req, res) => {
   try {
@@ -174,6 +247,10 @@ app.post('/api/login', async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.passwordhash);
     if (!valid) { recordFailedLogin(ip); return res.status(401).json({ error: 'Gecersiz giris bilgileri' }); }
+
+    if (!user.verified) {
+      return res.status(403).json({ error: 'E-posta dogrulanmamis', emailNotVerified: true });
+    }
 
     clearLoginAttempts(ip);
     await run('UPDATE users SET lastlogin = NOW()::text WHERE id = $1', [user.id]);
@@ -201,9 +278,10 @@ app.post('/api/register', async (req, res) => {
     if (email.length > 254) return res.status(400).json({ error: 'E-posta cok uzun' });
 
     const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
     const result = await run(
-      'INSERT INTO users (username, email, passwordhash, role, createdat) VALUES ($1, $2, $3, $4, NOW()::text) ON CONFLICT (username) DO NOTHING RETURNING id, username, role',
-      [u, email.trim().toLowerCase(), hash, 'user']
+      'INSERT INTO users (username, email, passwordhash, role, verified, verificationtoken, createdat) VALUES ($1, $2, $3, $4, false, $5, NOW()::text) ON CONFLICT (username) DO NOTHING RETURNING id, username, role',
+      [u, email.trim().toLowerCase(), hash, 'user', verificationToken]
     );
 
     if (!result.rows || result.rows.length === 0) {
@@ -211,9 +289,8 @@ app.post('/api/register', async (req, res) => {
     }
 
     const user = result.rows[0];
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
-    setTokenCookie(res, token);
-    res.json({ token, username: user.username, role: user.role });
+    await sendVerificationEmail(email.trim().toLowerCase(), verificationToken);
+    res.json({ ok: true, pendingVerification: true, username: user.username });
   } catch (e) {
     console.error('Register error:', e.stack);
     res.status(500).json({ error: 'Sunucu hatasi' });
@@ -476,9 +553,14 @@ app.use((err, req, res, next) => { console.error('Unhandled:', err.stack || err.
   const admin = await getOne('SELECT id FROM users WHERE username = $1', ['admin']);
   if (!admin) {
     const hash = await bcrypt.hash(ADMIN_PASSWORD, BCRYPT_ROUNDS);
-    await run('INSERT INTO users (username, email, passwordHash, role, createdAt) VALUES ($1, $2, $3, $4, NOW()::text)', ['admin', 'admin@example.com', hash, 'admin']);
+    await run('INSERT INTO users (username, email, passwordHash, role, verified, createdAt) VALUES ($1, $2, $3, $4, true, NOW()::text)', ['admin', 'admin@example.com', hash, 'admin']);
     console.log('Admin user created. Set ADMIN_PASSWORD env var to change the default password.');
   }
+
+  // Add verification columns if missing
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verificationToken TEXT');
+  await pool.query('UPDATE users SET verified = true WHERE role = $1', ['admin']);
 
   app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 })();

@@ -54,6 +54,9 @@
       'footer.built':'Vanilla JS ile yapildi',
       'footer.contact':'Iletisim',
       'footer.copyright':'&copy; 2026 fojizen. Tum haklari saklidir.',
+      'verify.title':'E-postani Dogrula','verify.desc':'Hesabini aktif etmek icin e-posta kutunu kontrol et. Dogrulama linkine tikla.',
+      'verify.close':'Tamam','verify.resend':'Tekrar Gonder',
+      'toast.verificationSent':'Dogrulama epostasi gonderildi',
       'auth.back':'Anasayfa','auth.subtitle':'Gorevlerini yonet, organize ol',
       'auth.tab.login':'Giris Yap','auth.tab.register':'Kayit Ol',
       'auth.login.user':'Kullanici Adi','auth.login.user.ph':'Kullanici adiniz',
@@ -136,6 +139,9 @@
       'footer.built':'Built with Vanilla JS',
       'footer.contact':'Contact',
       'footer.copyright':'&copy; 2026 fojizen. All rights reserved.',
+      'verify.title':'Verify Your Email','verify.desc':'Check your inbox and click the verification link to activate your account.',
+      'verify.close':'OK','verify.resend':'Resend',
+      'toast.verificationSent':'Verification email sent',
       'auth.back':'Home','auth.subtitle':'Manage your tasks, stay organized',
       'auth.tab.login':'Login','auth.tab.register':'Register',
       'auth.login.user':'Username','auth.login.user.ph':'Your username',
@@ -199,7 +205,7 @@
     'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}]
   };
 
-  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'footer.contact':1,'footer.copyright':1};
+  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
 
   function t(key) {
     return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.tr && i18n.tr[key]) || key;
@@ -667,7 +673,15 @@
       showToast(t('toast.loginOk'), 'success');
       setBtnSuccess(btn, function () { loadMain(); });
     }).catch(function (err) {
-      errEl.textContent = err.message || t('err.loginFailed');
+      if (err.message && err.message.indexOf('dogrulanmamis') !== -1) {
+        lastRegisteredUsername = username;
+        var emailDisplay = document.getElementById('verifyEmailDisplay');
+        if (emailDisplay) emailDisplay.textContent = username;
+        var vm = document.getElementById('verifyModal');
+        if (vm) vm.showModal();
+      } else {
+        errEl.textContent = err.message || t('err.loginFailed');
+      }
       setBtnLoading(btn, false);
     });
   });
@@ -698,15 +712,36 @@
       }
       return api('POST', '/register', { username: username, email: email, password: password });
     }).then(function (data) {
-      if (!data || !data.token) return;
-      authToken = data.token; currentUser = data.username; currentRole = data.role || 'user';
-      localStorage.setItem('authToken', data.token);
-      updateLandingNav();
-      showToast(t('toast.registerOk'), 'success');
-      setBtnSuccess(btn, function () { loadMain(); });
+      if (!data || !data.ok) return;
+      lastRegisteredUsername = data.username || username;
+      setBtnSuccess(btn, function () {
+        var verifyModal = document.getElementById('verifyModal');
+        var emailDisplay = document.getElementById('verifyEmailDisplay');
+        if (emailDisplay) emailDisplay.textContent = email;
+        if (verifyModal) verifyModal.showModal();
+      });
     }).catch(function (err) {
       if (err.message !== 'taken') errEl.textContent = err.message || t('toast.error');
       setBtnLoading(btn, false);
+    });
+  });
+
+  /* Verify modal */
+  var verifyModal = document.getElementById('verifyModal');
+  var resendBtn = document.getElementById('resendBtn');
+  var lastRegisteredUsername = '';
+  if (verifyModal) verifyModal.addEventListener('click', function (e) { if (e.target === this) this.close(); });
+  if (resendBtn) resendBtn.addEventListener('click', function () {
+    if (!lastRegisteredUsername) return;
+    resendBtn.disabled = true;
+    resendBtn.textContent = '...';
+    api('POST', '/resend-verification', { username: lastRegisteredUsername }).then(function () {
+      showToast(t('toast.verificationSent'), 'success');
+    }).catch(function (err) {
+      showToast(err.message || t('toast.error'), 'error');
+    }).finally(function () {
+      resendBtn.disabled = false;
+      resendBtn.textContent = t('verify.resend');
     });
   });
 

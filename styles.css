@@ -450,6 +450,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .modal-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border)}
 .modal-foot-right{display:flex;gap:8px}
 .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.verify-modal-box{padding:40px 32px;text-align:center;max-width:400px}
+.verify-icon{margin-bottom:16px;animation:verify-float 2s ease-in-out infinite}
+@keyframes verify-float{0%,100%{translate:0 0}50%{translate:0 -6px}}
+.verify-modal-box h2{font-size:1.25rem;font-weight:700;margin:0 0 8px}
+.verify-modal-box p{color:var(--muted);font-size:.875rem;margin:0 0 8px;line-height:1.5}
+.verify-email-display{font-weight:600;color:var(--accent);font-size:.875rem;margin:12px 0 20px !important}
+.verify-actions{display:flex;gap:8px;justify-content:center;margin-top:8px}
 
 /* ═══════════ THEME TOGGLE ICONS ═══════════ */
 [data-theme="dark"] .icon-sun{display:block}
