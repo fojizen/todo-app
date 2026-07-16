@@ -682,7 +682,7 @@
         var emailDisplay = document.getElementById('verifyEmailDisplay');
         if (emailDisplay) emailDisplay.textContent = username;
         var vm = document.getElementById('verifyModal');
-        if (vm) vm.showModal();
+        if (vm) vm.classList.add('active');
       } else {
         errEl.textContent = err.message || t('err.loginFailed');
       }
@@ -722,7 +722,7 @@
       var verifyModal = document.getElementById('verifyModal');
       var emailDisplay = document.getElementById('verifyEmailDisplay');
       if (emailDisplay) emailDisplay.textContent = email;
-      if (verifyModal) verifyModal.showModal();
+      if (verifyModal) verifyModal.classList.add('active');
       setBtnSuccess(btn);
     }).catch(function (err) {
       if (err.message !== 'taken') {
@@ -738,7 +738,7 @@
   var verifyModal = document.getElementById('verifyModal');
   var resendBtn = document.getElementById('resendBtn');
   var lastRegisteredUsername = '';
-  if (verifyModal) verifyModal.addEventListener('click', function (e) { if (e.target === this) this.close(); });
+  if (verifyModal) verifyModal.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('active'); });
   if (resendBtn) resendBtn.addEventListener('click', function () {
     if (!lastRegisteredUsername) return;
     resendBtn.disabled = true;
@@ -1206,7 +1206,13 @@
 
   /* ── Modals close ── */
   document.querySelectorAll('.modal-close').forEach(function (btn) {
-    btn.addEventListener('click', function () { var m = btn.closest('dialog'); if (m) m.close(); });
+    btn.addEventListener('click', function () {
+      var m = btn.closest('dialog') || btn.closest('.modal-overlay');
+      if (m) {
+        if (m.classList.contains('modal-overlay')) m.classList.remove('active');
+        else m.close();
+      }
+    });
   });
   var editModal = document.getElementById('editModal');
   if (editModal) editModal.addEventListener('click', function (e) { if (e.target === this) this.close(); });
