@@ -402,6 +402,32 @@
     if (actions) { actions.removeAttribute('style'); }
   }
 
+  function showLoader() {
+    var existing = document.getElementById('loader');
+    if (existing) return;
+    var el = document.createElement('div');
+    el.id = 'loader';
+    el.className = 'loader-screen';
+    el.innerHTML = '<div class="loader-content"><div class="loader-ring"><div class="loader-ring-glow"></div><div class="loader-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div></div><div class="loader-dots"><span></span><span></span><span></span></div></div>';
+    document.body.appendChild(el);
+  }
+
+  function hideLoader() {
+    var loader = document.getElementById('loader');
+    if (loader && !loader.classList.contains('fade-out')) {
+      loader.classList.add('fade-out');
+      setTimeout(function () { if (loader.parentNode) loader.remove(); }, 600);
+    }
+  }
+
+  function navigateTo(name) {
+    var current = document.querySelector('.page.active');
+    var next = document.getElementById(name);
+    if (current === next) return;
+    showLoader();
+    setTimeout(function () { showPage(name); }, 400);
+  }
+
   function showPage(name, noAnim) {
     transitioning = false;
     var next = document.getElementById(name);
@@ -469,10 +495,12 @@
     var welcomeEl = document.getElementById('userWelcome');
     if (welcomeEl) welcomeEl.textContent = t('welcome.prefix') + ' ' + currentUser + '!';
     showAdminBtn();
+    showLoader();
     loadTasks().then(function () {
       showPage('mainPage', true);
       render();
     }).catch(function (err) {
+      hideLoader();
       if (err.message === 'Internet baglantisi yok') {
         showToast('Internet baglantisi yok', 'error');
         return;
@@ -557,8 +585,8 @@
     localStorage.removeItem('authToken');
     todos = [];
     updateLandingNav();
-    showPage('landingPage', true);
-    initLanding();
+    navigateTo('landingPage');
+    setTimeout(function () { initLanding(); }, 450);
     showToast(t('toast.logout'), 'info');
   });
 
@@ -566,8 +594,8 @@
   var authBackBtn = document.getElementById('authBackBtn');
   if (authBackBtn) authBackBtn.addEventListener('click', function (e) {
     e.preventDefault();
-    showPage('landingPage', true);
-    initLanding();
+    navigateTo('landingPage');
+    setTimeout(initLanding, 450);
   });
 
   /* Login/Register tabs */
@@ -664,8 +692,8 @@
   var homeBtnEl = document.getElementById('homeBtn');
   if (homeBtnEl) homeBtnEl.addEventListener('click', function () {
     updateLandingNav();
-    showPage('landingPage', true);
-    initLanding();
+    navigateTo('landingPage');
+    setTimeout(initLanding, 450);
   });
 
   /* Logout button */
@@ -676,8 +704,8 @@
     localStorage.removeItem('authToken');
     todos = [];
     updateLandingNav();
-    showPage('landingPage', true);
-    initLanding();
+    navigateTo('landingPage');
+    setTimeout(initLanding, 450);
     showToast(t('toast.logout'), 'info');
   });
 
@@ -707,9 +735,9 @@
 
     document.addEventListener('click', function (e) {
       var ctaBtn = e.target.closest('.lp-cta-main, .lp-cta-final, .lp-register-btn');
-      if (ctaBtn) { if (currentUser) { loadMain(); } else { showPage('loginPage'); switchTab('register'); } return; }
+      if (ctaBtn) { if (currentUser) { loadMain(); } else { navigateTo('loginPage'); setTimeout(function(){ switchTab('register'); }, 450); } return; }
       var loginBtn = e.target.closest('.lp-login-btn');
-      if (loginBtn) { showPage('loginPage'); switchTab('login'); return; }
+      if (loginBtn) { navigateTo('loginPage'); setTimeout(function(){ switchTab('login'); }, 450); return; }
       var anchor = e.target.closest('a[href^="#"]');
       if (anchor) {
         var href = anchor.getAttribute('href');
@@ -1132,9 +1160,9 @@
 
   /* ── Admin ── */
   var adminBtnEl = document.getElementById('adminBtn');
-  if (adminBtnEl) adminBtnEl.addEventListener('click', function () { showPage('adminPage', true); loadAdminUsers(); });
+  if (adminBtnEl) adminBtnEl.addEventListener('click', function () { navigateTo('adminPage'); loadAdminUsers(); });
   var adminBackBtn = document.getElementById('adminBackBtn');
-  if (adminBackBtn) adminBackBtn.addEventListener('click', function () { showPage('mainPage', true); });
+  if (adminBackBtn) adminBackBtn.addEventListener('click', function () { navigateTo('mainPage'); });
 
   function loadAdminUsers() {
     api('GET', '/admin/users').then(function (users) {
