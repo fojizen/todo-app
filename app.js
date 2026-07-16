@@ -406,6 +406,7 @@
     transitioning = false;
     var next = document.getElementById(name);
     if (!next) return;
+    document.documentElement.classList.remove('loading');
     var current = document.querySelector('.page.active');
 
     if (current && current !== next && !noAnim) {
@@ -1234,7 +1235,6 @@
   try { setLanguage(currentLang); } catch (e) { console.error('setLanguage error:', e); }
   updateLandingNav();
   initLanding();
-  document.documentElement.classList.remove('loading');
 
   var savedPage = 'landingPage';
   try { savedPage = localStorage.getItem('lastPage') || 'landingPage'; } catch (e) {}
