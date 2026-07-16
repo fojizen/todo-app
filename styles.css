@@ -526,6 +526,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .modal-body{padding:16px}
 }
 
+/* ── Loader ── */
+.loader-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .5s ease,visibility .5s ease}
+.loader-screen.fade-out{opacity:0;visibility:hidden}
+.loader-content{display:flex;flex-direction:column;align-items:center;gap:24px}
+.loader-icon{width:80px;height:80px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;animation:loader-pulse 1.5s ease-in-out infinite,loader-float 2s ease-in-out infinite;box-shadow:0 8px 32px rgba(124,92,255,.3)}
+@keyframes loader-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes loader-float{0%,100%{translate:0 0}50%{translate:0 -8px}}
+.loader-bar{width:160px;height:3px;border-radius:4px;background:var(--border);overflow:hidden}
+.loader-bar-fill{height:100%;width:40%;border-radius:4px;background:linear-gradient(90deg,#7c5cff,#a78bfa);animation:loader-slide 1.2s ease-in-out infinite}
+@keyframes loader-slide{0%{translate:-100% 0}100%{translate:350% 0}}
+
 /* ── Print ── */
 @media print {
   body { background: #fff !important; color: #000 !important; }

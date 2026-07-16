@@ -407,6 +407,11 @@
     var next = document.getElementById(name);
     if (!next) return;
     document.documentElement.classList.remove('loading');
+    var loader = document.getElementById('loader');
+    if (loader && !loader.classList.contains('fade-out')) {
+      loader.classList.add('fade-out');
+      setTimeout(function () { loader.remove(); }, 600);
+    }
     var current = document.querySelector('.page.active');
 
     if (current && current !== next && !noAnim) {
