@@ -170,8 +170,9 @@ console.log('GMAIL_USER set:', !!process.env.GMAIL_USER, 'GMAIL_PASS set:', !!pr
 
 const mailTransporter = (GMAIL_USER && GMAIL_PASS) ? nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
+  requireTLS: true,
   family: 4,
   auth: { user: GMAIL_USER, pass: GMAIL_PASS.replace(/\s/g, '') }
 }) : null;
