@@ -8,7 +8,6 @@ const cors = require('cors');
 const crypto = require('crypto');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -163,31 +162,11 @@ function adminOnly(req, res, next) {
 }
 
 // ── Email Verification ─────────────────────────────────
-const GMAIL_USER = process.env.GMAIL_USER;
-const GMAIL_PASS = process.env.GMAIL_PASS;
-
-console.log('GMAIL_USER set:', !!process.env.GMAIL_USER, 'GMAIL_PASS set:', !!process.env.GMAIL_PASS);
-
-const mailTransporter = (GMAIL_USER && GMAIL_PASS) ? nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  family: 4,
-  auth: { user: GMAIL_USER, pass: GMAIL_PASS.replace(/\s/g, '') }
-}) : null;
-
-if (mailTransporter) {
-  mailTransporter.verify().then(function () {
-    console.log('Gmail SMTP connection OK');
-  }).catch(function (e) {
-    console.error('Gmail SMTP connection FAILED:', e.message);
-  });
-}
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 async function sendVerificationEmail(email, token) {
-  if (!mailTransporter) {
-    console.warn('GMAIL_USER/GMAIL_PASS not set, skipping verification email');
+  if (!RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not set, skipping verification email');
     return false;
   }
   const verifyUrl = FRONTEND_URL + '/api/verify-email/' + token;
@@ -199,16 +178,20 @@ async function sendVerificationEmail(email, token) {
     '<p style="text-align:center;color:#9ca3af;font-size:13px">Bu e-postayi sen talep etmediysen, gonemseme.</p>' +
     '</div>';
   try {
-    const info = await mailTransporter.sendMail({
-      from: '"TodoApp" <' + GMAIL_USER + '>',
-      to: email,
-      subject: 'E-postani Dogrula - TodoApp',
-      html: html
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'TodoApp <onboarding@resend.dev>', to: email, subject: 'E-postani Dogrula - TodoApp', html })
     });
-    console.log('Verification email sent:', info.messageId);
+    if (!resp.ok) {
+      const err = await resp.text();
+      console.error('Resend error:', err);
+      return false;
+    }
+    console.log('Verification email sent via Resend');
     return true;
   } catch (e) {
-    console.error('Email send failed:', e.code, e.message);
+    console.error('Email send failed:', e.message);
     return false;
   }
 }
