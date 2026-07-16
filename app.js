@@ -554,8 +554,26 @@
   }
 
   function setBtnLoading(btn, loading) {
-    if (loading) { btn.disabled = true; btn.dataset.txt = btn.textContent; btn.innerHTML = '<span class="spinner"></span>'; }
-    else { btn.disabled = false; btn.textContent = btn.dataset.txt || btn.textContent; }
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.txt = btn.textContent;
+      btn.innerHTML = '<span class="btn-spinner"></span>';
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.txt || btn.textContent;
+    }
+  }
+
+  function setBtnSuccess(btn, cb) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-check">&#10003;</span>';
+    btn.classList.add('btn-success');
+    setTimeout(function () {
+      btn.classList.remove('btn-success');
+      btn.disabled = false;
+      btn.textContent = btn.dataset.txt || btn.textContent;
+      if (cb) cb();
+    }, 700);
   }
 
   /* ══════════════════════════════════════
@@ -647,10 +665,11 @@
       localStorage.setItem('authToken', data.token);
       updateLandingNav();
       showToast(t('toast.loginOk'), 'success');
-      loadMain();
+      setBtnSuccess(btn, function () { loadMain(); });
     }).catch(function (err) {
       errEl.textContent = err.message || t('err.loginFailed');
-    }).finally(function () { setBtnLoading(btn, false); });
+      setBtnLoading(btn, false);
+    });
   });
 
   /* Register form */
@@ -684,10 +703,11 @@
       localStorage.setItem('authToken', data.token);
       updateLandingNav();
       showToast(t('toast.registerOk'), 'success');
-      loadMain();
+      setBtnSuccess(btn, function () { loadMain(); });
     }).catch(function (err) {
       if (err.message !== 'taken') errEl.textContent = err.message || t('toast.error');
-    }).finally(function () { setBtnLoading(btn, false); });
+      setBtnLoading(btn, false);
+    });
   });
 
   /* Home button */

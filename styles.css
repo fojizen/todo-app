@@ -86,6 +86,11 @@ html.loading .page{display:none!important}
 .btn-sm{padding:6px 12px;font-size:.8125rem}
 .btn-lg{padding:12px 24px;font-size:1rem}
 .btn-full{width:100%;justify-content:center}
+.btn-spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:btn-spin .6s linear infinite}
+@keyframes btn-spin{to{rotate:360deg}}
+.btn-check{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:14px;font-weight:700;color:#fff;animation:btn-pop .3s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes btn-pop{0%{scale:0}100%{scale:1}}
+.btn-success{background:#22c55e!important;border-color:#22c55e!important;pointer-events:none}
 .btn-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r);background:transparent;border:1px solid transparent;color:var(--text2);transition:all var(--tr)}
 .btn-icon:hover{color:var(--text);background:var(--bg3)}
 
