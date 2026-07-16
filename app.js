@@ -281,10 +281,10 @@
   var _pendingTasks = {};
   function api(method, path, body) {
     var key = method + ':' + path;
-    if (method === 'POST' || method === 'PUT') {
+    if (body && (method === 'POST')) {
       if (_pendingTasks[key]) return Promise.reject(new Error('Islem devam ediyor'));
       _pendingTasks[key] = true;
-      setTimeout(function () { delete _pendingTasks[key]; }, 2000);
+      setTimeout(function () { delete _pendingTasks[key]; }, 1000);
     }
     var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
     if (authToken) opts.headers['Authorization'] = 'Bearer ' + authToken;
