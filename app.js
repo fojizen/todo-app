@@ -1251,9 +1251,9 @@
 
   /* ── Admin ── */
   var adminBtnEl = document.getElementById('adminBtn');
-  if (adminBtnEl) adminBtnEl.addEventListener('click', function () { navigateTo('adminPage'); loadAdminUsers(); });
+  if (adminBtnEl) adminBtnEl.addEventListener('click', function () { showPage('adminPage', true); loadAdminUsers(); });
   var adminBackBtn = document.getElementById('adminBackBtn');
-  if (adminBackBtn) adminBackBtn.addEventListener('click', function () { navigateTo('mainPage'); });
+  if (adminBackBtn) adminBackBtn.addEventListener('click', function () { showPage('mainPage', true); });
 
   function loadAdminUsers() {
     api('GET', '/admin/users').then(function (users) {
