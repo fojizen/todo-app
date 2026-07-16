@@ -7,6 +7,13 @@
   /* ── Constants ── */
   var API = window.location.origin + '/api';
 
+  /* ── Inject verify modal into body (mobile fix) ── */
+  var vmWrap = document.createElement('div');
+  vmWrap.id = 'verifyModal';
+  vmWrap.className = 'modal-overlay';
+  vmWrap.innerHTML = '<div class="modal-box verify-modal-box"><div class="verify-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg></div><h2 data-lang-key="verify.title">E-postani Dogrula</h2><p data-lang-key="verify.desc">Hesabini aktif etmek icin e-posta kutunu kontrol et. Dogrulama linkine tikla.</p><p class="verify-email-display" id="verifyEmailDisplay"></p><div class="verify-actions"><button class="btn btn-ghost modal-close" data-lang-key="verify.close">Tamam</button><button class="btn btn-secondary" id="resendBtn" data-lang-key="verify.resend">Tekrar Gonder</button></div></div>';
+  document.body.appendChild(vmWrap);
+
   /* ── State ── */
   var authToken = localStorage.getItem('authToken');
   var currentUser = null;
