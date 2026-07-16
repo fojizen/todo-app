@@ -244,6 +244,7 @@ html.loading .page{display:none!important}
 .lp-footer-right{font-size:.8125rem;color:var(--muted)}
 .lp-footer-copy{text-align:center;font-size:.75rem;color:var(--muted);padding:16px 0 0;border-top:1px solid var(--border);margin-top:16px;letter-spacing:.02em}
 .lp-footer-links{display:flex;align-items:center;gap:14px}
+.lp-footer-contact-label{font-size:.8125rem;font-weight:600;color:var(--muted);margin-right:2px}
 .lp-footer-links a{color:var(--muted);transition:color .2s,translate .2s}
 .lp-footer-links a:hover{color:var(--accent);translate:0 -2px}
 .page-footer-copy{text-align:center;font-size:.75rem;color:var(--muted);padding:16px 24px;border-top:1px solid var(--border);margin-top:auto}

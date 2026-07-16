@@ -52,6 +52,7 @@
       'cta.sub loggedIn':'Gorevlerini incele, yeni Gorevler ekle ve tamamlananlari takip et.',
       'cta.btn loggedIn':'Gorevlerime Git',
       'footer.built':'Vanilla JS ile yapildi',
+      'footer.contact':'Iletisim',
       'footer.copyright':'&copy; 2026 fojizen. Tum haklari saklidir.',
       'auth.back':'Anasayfa','auth.subtitle':'Gorevlerini yonet, organize ol',
       'auth.tab.login':'Giris Yap','auth.tab.register':'Kayit Ol',
@@ -133,6 +134,7 @@
       'cta.sub loggedIn':'Review your tasks, add new ones and track what you have completed.',
       'cta.btn loggedIn':'Go to My Tasks',
       'footer.built':'Built with Vanilla JS',
+      'footer.contact':'Contact',
       'footer.copyright':'&copy; 2026 fojizen. All rights reserved.',
       'auth.back':'Home','auth.subtitle':'Manage your tasks, stay organized',
       'auth.tab.login':'Login','auth.tab.register':'Register',
@@ -197,7 +199,7 @@
     'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}]
   };
 
-  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'footer.copyright':1};
+  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'footer.contact':1,'footer.copyright':1};
 
   function t(key) {
     return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.tr && i18n.tr[key]) || key;
