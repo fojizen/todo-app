@@ -444,11 +444,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .admin-info-value{font-weight:600}
 
 /* ═══════════ MODAL ═══════════ */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:24px}
-.modal-overlay.active{display:flex}
-.modal{border:none;border-radius:var(--r2);background:var(--bg2);color:var(--text);padding:0;max-width:500px;width:calc(100% - 48px);box-shadow:var(--shadow);overflow:visible;margin:auto}
-.modal[open]{animation:modalIn .2s ease}
-@keyframes modalIn{from{opacity:0}to{opacity:1}}
+.modal-overlay{display:none!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;z-index:99999!important;background:rgba(0,0,0,.7)!important;align-items:center;justify-content:center;padding:24px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex!important}
+.modal{border:none;border-radius:var(--r2);background:var(--bg2);color:var(--text);padding:0;max-width:500px;width:calc(100% - 48px);box-shadow:var(--shadow);overflow:visible;margin:auto;animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .modal-box{padding:0}
 .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
 .modal-head h2{font-size:1.1rem;font-weight:700}
