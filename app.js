@@ -62,6 +62,7 @@
       'auth.login.user':'Kullanici Adi','auth.login.user.ph':'Kullanici adiniz',
       'auth.login.pw':'Sifre','auth.login.pw.ph':'Sifreniz','auth.login.pw.aria':'Sifreyi goster/gizle',
       'auth.login.btn':'Giris Yap',
+      'err.emailTaken':'Bu e-posta adresi zaten kayitli',
       'auth.reg.user':'Kullanici Adi','auth.reg.user.ph':'Kullanici adi (3-20 karakter)',
       'auth.reg.email':'E-posta','auth.reg.pw':'Sifre','auth.reg.pw.ph':'En az 6 karakter',
       'auth.reg.terms':'Kullanim sartlarini kabul ediyorum','auth.reg.btn':'Kayit Ol',
@@ -147,6 +148,7 @@
       'auth.login.user':'Username','auth.login.user.ph':'Your username',
       'auth.login.pw':'Password','auth.login.pw.ph':'Your password','auth.login.pw.aria':'Show/hide password',
       'auth.login.btn':'Login',
+      'err.emailTaken':'This email is already registered',
       'auth.reg.user':'Username','auth.reg.user.ph':'Username (3-20 characters)',
       'auth.reg.email':'Email','auth.reg.pw':'Password','auth.reg.pw.ph':'At least 6 characters',
       'auth.reg.terms':'I accept the terms of service','auth.reg.btn':'Register',
@@ -721,7 +723,11 @@
         if (verifyModal) verifyModal.showModal();
       });
     }).catch(function (err) {
-      if (err.message !== 'taken') errEl.textContent = err.message || t('toast.error');
+      if (err.message !== 'taken') {
+        var msg = err.message || t('toast.error');
+        if (msg === 'Bu e-posta adresi zaten kayitli') msg = t('err.emailTaken');
+        errEl.textContent = msg;
+      }
       setBtnLoading(btn, false);
     });
   });
