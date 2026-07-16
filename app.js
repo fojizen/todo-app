@@ -831,11 +831,21 @@
           links.style.display = vis ? 'none' : 'flex';
           if (actions) actions.style.display = vis ? 'none' : 'flex';
           if (!vis) {
+            links.style.display = 'flex';
             Object.assign(links.style, {
-              flexDirection: 'column', position: 'absolute', top: '60px', left: '0', right: '0',
+              flexDirection: 'column', position: 'absolute', top: '56px', left: '0', right: '0',
               background: 'var(--card)', padding: '16px 24px', backdropFilter: 'blur(24px)',
               borderBottom: '1px solid var(--border)', zIndex: '1000', gap: '16px'
             });
+            if (actions) {
+              actions.style.display = 'flex';
+              var topOffset = links.offsetHeight + 56;
+              Object.assign(actions.style, {
+                flexDirection: 'column', position: 'absolute', top: topOffset + 'px', left: '0', right: '0',
+                background: 'var(--card)', padding: '16px 24px', backdropFilter: 'blur(24px)',
+                borderBottom: '1px solid var(--border)', zIndex: '1000', gap: '12px'
+              });
+            }
           }
         }
         return;
