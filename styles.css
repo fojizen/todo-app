@@ -140,8 +140,9 @@ html.loading .page{display:none!important}
 /* Hamburger */
 .lp-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:8px;cursor:pointer}
 .lp-hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s ease}
-.lp-mobile-tools{display:none;align-items:center;gap:2px}
-.lp-mobile-tools .btn,.lp-mobile-tools .btn-icon{padding:8px !important;font-size:.75rem !important;line-height:1 !important;min-width:34px;min-height:34px;display:flex;align-items:center;justify-content:center}
+.lp-mobile-tools{display:none;align-items:center;gap:0}
+.lp-mobile-tools .btn,.lp-mobile-tools .btn-icon{padding:10px !important;font-size:.8rem !important;line-height:1 !important;min-width:38px;min-height:38px;display:flex;align-items:center;justify-content:center}
+.lp-mobile-right{display:none;align-items:center;gap:0}
 
 /* Hero */
 .lp-hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px;overflow:hidden}
@@ -482,6 +483,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-nav-links,.lp-nav-actions{display:none}
   .lp-hamburger{display:flex}
   .lp-mobile-tools{display:flex}
+  .lp-mobile-right{display:flex}
   .lp-section{padding:60px 0}
   .lp-features-grid{grid-template-columns:1fr}
   .lp-tech-grid{grid-template-columns:1fr}
@@ -514,6 +516,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-nav-links,.lp-nav-actions{display:none}
   .lp-hamburger{display:flex}
   .lp-mobile-tools{display:flex}
+  .lp-mobile-right{display:flex}
   .lp-features-grid{grid-template-columns:repeat(2,1fr)}
   .task-actions{opacity:1}
 }
