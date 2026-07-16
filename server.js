@@ -1,4 +1,6 @@
 const express = require('express');
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
