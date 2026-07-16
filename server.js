@@ -165,9 +165,19 @@ const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_PASS = process.env.GMAIL_PASS;
 
 const mailTransporter = (GMAIL_USER && GMAIL_PASS) ? nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: GMAIL_USER, pass: GMAIL_PASS }
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: { user: GMAIL_USER, pass: GMAIL_PASS.replace(/\s/g, '') }
 }) : null;
+
+if (mailTransporter) {
+  mailTransporter.verify().then(function () {
+    console.log('Gmail SMTP connection OK');
+  }).catch(function (e) {
+    console.error('Gmail SMTP connection FAILED:', e.message);
+  });
+}
 
 async function sendVerificationEmail(email, token) {
   if (!mailTransporter) {
@@ -183,15 +193,16 @@ async function sendVerificationEmail(email, token) {
     '<p style="text-align:center;color:#9ca3af;font-size:13px">Bu e-postayi sen talep etmediysen, gonemseme.</p>' +
     '</div>';
   try {
-    await mailTransporter.sendMail({
+    const info = await mailTransporter.sendMail({
       from: '"TodoApp" <' + GMAIL_USER + '>',
       to: email,
       subject: 'E-postani Dogrula - TodoApp',
       html: html
     });
+    console.log('Verification email sent:', info.messageId);
     return true;
   } catch (e) {
-    console.error('Email send failed:', e.message);
+    console.error('Email send failed:', e.code, e.message);
     return false;
   }
 }
