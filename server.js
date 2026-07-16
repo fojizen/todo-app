@@ -351,7 +351,7 @@ app.get('/api/admin/users', auth, adminOnly, async (req, res) => {
   try {
     const users = await getAll(`
       SELECT u.id, u.username, u.email, u.role, u.banned, u.lastlogin, u.createdat,
-             COALESCE(t.cnt, 0)::int AS taskcount
+             COALESCE(t.cnt, 0)::int AS "taskCount"
       FROM users u
       LEFT JOIN (SELECT userid, COUNT(*) AS cnt FROM tasks GROUP BY userid) t ON t.userid = u.id
       ORDER BY u.id ASC
@@ -367,7 +367,7 @@ app.get('/api/admin/users/:id', auth, adminOnly, async (req, res) => {
   try {
     const user = await getOne(`
       SELECT u.id, u.username, u.email, u.role, u.banned, u.lastlogin, u.createdat,
-             COALESCE(t.cnt, 0)::int AS taskcount
+             COALESCE(t.cnt, 0)::int AS "taskCount"
       FROM users u
       LEFT JOIN (SELECT userid, COUNT(*) AS cnt FROM tasks GROUP BY userid) t ON t.userid = u.id
       WHERE u.id = $1
