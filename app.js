@@ -235,7 +235,7 @@
       if (opts.some(function (o) { return o.value === curVal; })) sel.value = curVal;
     });
 
-    document.title = lang === 'tr' ? 'Todo App - Gorev Yonetimi' : 'Todo App - Task Management';
+    document.title = lang === 'tr' ? 'Todo App - Gorev Yonetimi | fojizen' : 'Todo App - Task Management | fojizen';
     document.querySelectorAll('.lang-toggle').forEach(function (btn) {
       btn.textContent = lang === 'tr' ? 'EN' : 'TR';
     });
