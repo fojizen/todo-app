@@ -441,9 +441,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 /* ═══════════ MODAL ═══════════ */
 .modal{border:none;border-radius:var(--r2);background:var(--bg2);color:var(--text);padding:0;max-width:500px;width:calc(100% - 48px);box-shadow:var(--shadow);overflow:visible;margin:auto}
-.modal::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.modal[open]{animation:modalIn .3s ease}
-@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal::backdrop{background:rgba(0,0,0,.5)}
+.modal[open]{animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0}to{opacity:1}}
 .modal-box{padding:0}
 .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
 .modal-head h2{font-size:1.1rem;font-weight:700}
@@ -451,12 +451,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .modal-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border)}
 .modal-foot-right{display:flex;gap:8px}
 .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.verify-modal-box{padding:40px 32px;text-align:center;max-width:400px;display:flex;flex-direction:column;align-items:center}
-.verify-icon{margin-bottom:16px}
-.verify-modal-box h2{font-size:1.25rem;font-weight:700;margin:0 0 8px}
-.verify-modal-box p{color:var(--muted);font-size:.875rem;margin:0 0 8px;line-height:1.5;max-width:320px}
-.verify-email-display{font-weight:600;color:var(--accent);font-size:.875rem;margin:12px 0 20px !important}
-.verify-actions{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.verify-modal-box{padding:40px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.verify-icon{margin-bottom:20px}
+.verify-modal-box h2{font-size:1.25rem;font-weight:700;margin:0 0 10px;text-align:center}
+.verify-modal-box p{color:var(--muted);font-size:.875rem;margin:0 0 8px;line-height:1.6;text-align:center}
+.verify-email-display{font-weight:600;color:var(--accent);font-size:.875rem;margin:12px 0 24px !important;text-align:center}
+.verify-actions{display:flex;gap:10px;justify-content:center;margin-top:4px}
 
 /* ═══════════ THEME TOGGLE ICONS ═══════════ */
 [data-theme="dark"] .icon-sun{display:block}
