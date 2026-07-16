@@ -1,7 +1,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-24.x-339933?logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/SQLite-sql.js-003B57?logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/Frontend-Vanilla_JS-F7DF1E?logo=javascript&logoColor=black" alt="Vanilla JS">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" alt="Status">
 </p>
@@ -10,14 +11,15 @@
 
 <p align="center">
   Modern, guvenli ve estetik bir gorev yonetimi uygulamasi.<br>
-  Vanilla JS frontend + Express.js backend + SQLite veritabani.
+  Vanilla JS frontend + Express.js backend + PostgreSQL veritabani.
 </p>
 
 <p align="center">
+  <a href="https://fojizen-todo-app.onrender.com" target="_blank">Canli Demo</a> &bull;
   <a href="#ozellikler">Ozellikler</a> &bull;
-  <a href="#ekran-goruntuleri">Ekran Goruntuleri</a> &bull;
   <a href="#kurulum">Kurulum</a> &bull;
-  <a href="#api-referansi">API</a>
+  <a href="#api-referansi">API</a> &bull;
+  <a href="#cevresel-degiskenler">Ortam Degiskenleri</a>
 </p>
 
 ---
@@ -62,12 +64,13 @@
 - Filtreleme: durum, oncelik, kategori, arama
 - Siralama: tarih, oncelik, olusturma, siralamaya gore
 - Tamamlanan gorevleri toplu silme
+- Gorev sayisi ve istatistikleri
 
 ### Kullanici Sistemi
 - Kayit olma (kullanici adi musaitlik kontrolu, e-posta dogrulama)
-- Giris yapma
-- Oturum yonetimi (JWT, 7 gun sure)
-- Guvenli sifre depolama (bcrypt, 12 rounds)
+- Giris yapma (buton spinner + tik animasyonu)
+- Oturum yonetimi (JWT, httpOnly cookie, 7 gun sure)
+- Guvenli sifre depolama (bcrypt, 12 rounds, async)
 - Sayfa yenileme durumunda son sayfayi hatirlama
 
 ### Admin Paneli
@@ -83,21 +86,25 @@
 - Partikul animasyonlu arka plan (Canvas API)
 - Login sayfasinda animasyonlu orb, grid ve kod snippet'leri
 - Glassmorphism efektleri
+- Modern loader animasyonu (donen glow halka)
 - Responsive tasarim (mobil, tablet, desktop, TV)
 - Zoom uyumlu layout
 - TR / EN dil destegi
 - Sayfa gecis animasyonlari
 - Gelistirilmis secenekler paneli (modern select, date picker, tag input)
+- Footer sosyal medya baglantilari (GitHub, LinkedIn, Instagram, Portfolio)
 
 ### Guvenlik
-- Rate limiting (login: 15/dk, register: 10/15dk)
+- Rate limiting (login: 15/dk, register: 10/15dk, gorev CRUD: 30/dk)
 - Brute force korumasi (5 basarisiz giris → 15 dk kilit)
-- Guvenlik headerlari: X-Content-Type-Options, X-Frame-Options: DENY, X-XSS-Protection, Referrer-Policy, Permissions-Policy
+- Guvenlik headerlari: HSTS, CSP, X-Content-Type-Options, X-Frame-Options: DENY, X-XSS-Protection, Referrer-Policy, Permissions-Policy
 - CORS sinirlamasi (sadece izin verilen origin'ler)
-- JWT token ile yetkilendirme (7 gun sure)
-- Girdi dogrulama (tip, uzunluk, regex)
+- JWT token ile yetkilendirme (httpOnly cookie, 7 gun sure)
+- Girdi dogrulama (tip, uzunluk, regex, 500 karakter siniri)
 - XSS korumasi (HTML encoding, attribute escaping)
 - SQL injection korumasi (prepared statements)
+- Double-submit onleme (POST-only, 1s cooldown)
+- Race condition onleme (ON CONFLICT)
 
 ---
 
@@ -107,11 +114,13 @@
 |--------|-----------|
 | Frontend | Vanilla HTML5, CSS3, JavaScript (ES5+) |
 | Backend | Express.js 5.x |
-| Veritabani | SQLite (sql.js WASM) |
-| Kimlik Dogrulama | JWT (jsonwebtoken) |
-| Sifreleme | bcryptjs |
+| Veritabani | PostgreSQL (Supabase) |
+| Kimlik Dogrulama | JWT (jsonwebtoken) + httpOnly cookie |
+| Sifreleme | bcryptjs (async) |
+| Cookie | cookie-parser |
 | Styling | Custom CSS (CSS Variables, Glassmorphism, Animasyonlar) |
 | Animasyonlar | Canvas API (partikuller), CSS Animasyonlar |
+| Deployment | OnRender (backend) + GitHub Pages |
 
 ---
 
@@ -120,6 +129,7 @@
 ### On kosullar
 - [Node.js](https://nodejs.org/) 18+ (test edilmis: 24.x)
 - npm
+- PostgreSQL veritabani (Supabase veya yerel)
 
 ### Adimlar
 
@@ -131,6 +141,10 @@ cd todo-app
 # Bagimliliklari yukle
 npm install
 
+# Ortam degiskenlerini ayarla
+cp .env.example .env
+# .env dosyasini duzenle
+
 # Serveri baslat
 node server.js
 ```
@@ -141,7 +155,7 @@ Sunucu varsayilan olarak `http://localhost:3000` adresinde baslar.
 
 | Kullanici | Sifre | Rol |
 |-----------|-------|-----|
-| `admin` | `fıj9823r82fkowpefpowflwfw211dawdFDQ` | admin |
+| `admin` | Ortam degiskeninden (`ADMIN_PASSWORD`) | admin |
 
 > Uretim ortaminda varsayilan sifreyi degistirmeyi unutmayin.
 
@@ -156,14 +170,17 @@ todo-app/
 ├── index.html         # Ana HTML sayfasi (landing, login, main, admin, modallar)
 ├── styles.css         # CSS stilleri (tema, responsive, animasyonlar)
 ├── package.json       # Bagimliliklar ve scriptler
+├── favicon.svg        # SVG favicon (mor tik ikonu)
+├── favicon.ico        # ICO favicon (arama motorlari icin)
+├── apple-touch-icon.png # Apple mobil favicon
+├── sitemap.xml        # Sitemap (arama motorlari icin)
 ├── screenshots/       # Ekran goruntuleri (GitHub icin)
 │   ├── homepage.png
 │   ├── features.png
 │   ├── login.png
 │   └── MyTasks.png
 └── data/
-    ├── todo.sqlite    # SQLite veritabani (otomatik olusturulur)
-    └── .jwt_secret    # JWT anahtari (otomatik olusturulur)
+    └── .jwt_secret    # JWT anahtari (uretimde env var ile degistirilir)
 ```
 
 ---
@@ -176,8 +193,9 @@ Tum API istekleri `/api` on ekini gerektirir.
 
 | Method | Endpoint | Aciklama |
 |--------|----------|----------|
-| `POST` | `/api/login` | Giris yapma |
-| `POST` | `/api/register` | Kayit olma |
+| `POST` | `/api/login` | Giris yapma (cookie ile token doner) |
+| `POST` | `/api/register` | Kayit olma (cookie ile token doner) |
+| `POST` | `/api/logout` | Cikis yapma (cookie temizlenir) |
 | `GET` | `/api/check-username/:username` | Kullanici adi musaitlik kontrolu |
 | `GET` | `/api/me` | Mevcut kullanici bilgisi (token gerekli) |
 
@@ -204,11 +222,14 @@ Tum API istekleri `/api` on ekini gerektirir.
 
 ## Cevresel Degiskenler
 
-| Degisken | Aciklama | Varsayilan |
-|----------|----------|------------|
-| `PORT` | Sunucu portu | `3000` |
-| `JWT_SECRET` | JWT imza anahtari | Otomatik olusturulur (dosyaya kaydedilir) |
-| `ALLOWED_ORIGINS` | Izin verilen origin'ler (virgullu) | `http://localhost:3000,http://127.0.0.1:3000` |
+| Degisken | Aciklama | Zorunlu |
+|----------|----------|---------|
+| `PORT` | Sunucu portu | Hayir (varsayilan: 3000) |
+| `DATABASE_URL` | PostgreSQL connection string | Evet |
+| `JWT_SECRET` | JWT imza anahtari (minimum 64 karakter) | Evet |
+| `ADMIN_PASSWORD` | Varsayilan admin sifresi | Evet |
+| `FRONTEND_URL` | Frontend URL'si (CORS icin) | Hayir (varsayilan: localhost:3000) |
+| `NODE_ENV` | Ortam (`production` / `development`) | Hayir (varsayilan: development) |
 
 ---
 
@@ -218,43 +239,77 @@ Tum API istekleri `/api` on ekini gerektirir.
 
 | Kolon | Tip | Aciklama |
 |-------|-----|----------|
-| id | INTEGER | Anahtar, otomatik artan |
+| id | SERIAL | Anahtar, otomatik artan |
 | username | TEXT | Benzersiz kullanici adi |
 | email | TEXT | E-posta adresi |
-| passwordHash | TEXT | bcrypt ile hashlenmis sifre |
+| passwordhash | TEXT | bcrypt ile hashlenmis sifre |
 | role | TEXT | `admin` veya `user` |
-| banned | INTEGER | 0: aktif, 1: banli |
-| lastLogin | TEXT | Son giris tarihi |
-| createdAt | TEXT | Kayit tarihi |
+| banned | BOOLEAN | `true`: banli, `false`: aktif |
+| lastlogin | TEXT | Son giris tarihi |
+| createdat | TEXT | Kayit tarihi |
 
 ### tasks
 
 | Kolon | Tip | Aciklama |
 |-------|-----|----------|
-| id | INTEGER | Anahtar, otomatik artan |
-| userId | INTEGER | Kullanici ID (FK) |
-| text | TEXT | Gorev metni |
-| done | INTEGER | 0: bekliyor, 1: tamamlandi |
+| id | SERIAL | Anahtar, otomatik artan |
+| userid | INTEGER | Kullanici ID (FK → users.id) |
+| text | TEXT | Gorev metni (maks 500 karakter) |
+| done | BOOLEAN | `true`: tamamlandi, `false`: bekliyor |
 | priority | TEXT | `low`, `medium`, `high` |
-| dueDate | TEXT | Bitis tarihi (YYYY-MM-DD) |
+| duedate | TEXT | Bitis tarihi (YYYY-MM-DD) |
 | category | TEXT | Kategori adi |
 | tags | TEXT | JSON array olarak etiketler |
-| itemOrder | INTEGER | Siralama degeri |
-| createdAt | TEXT | Olusturma tarihi |
-| updatedAt | TEXT | Guncelleme tarihi |
+| itemorder | INTEGER | Siralama degeri |
+| createdat | TEXT | Olusturma tarihi |
+| updatedat | TEXT | Guncelleme tarihi |
+
+### login_attempts (brute force korumasi)
+
+| Kolon | Tip | Aciklama |
+|-------|-----|----------|
+| id | SERIAL | Anahtar |
+| username | TEXT | Kullanici adi |
+| ip | TEXT | IP adresi |
+| success | BOOLEAN | Basarili giris mi |
+| createdat | TEXT | Deneme tarihi |
 
 ---
 
 ## Guvenlik
 
-- **Sifreleme:** bcrypt (12 rounds) ile sifre hashleme
-- **Token:** JWT 7 gun sure, HS256 imza
-- **Rate Limiting:** IP bazli istek sinirlamasi
+- **Sifreleme:** bcrypt (12 rounds) ile sifre hashleme (async)
+- **Token:** JWT 7 gun sure, HS256 imza, httpOnly cookie
+- **Rate Limiting:** IP bazli istek sinirlamasi (login, register, gorev CRUD)
 - **Brute Force:** 5 basarisiz giris denemesinden sonra 15 dakika kilit
-- **Header'lar:** Clickjacking, MIME sniffing, XSS korumasi
+- **Header'lar:** HSTS, CSP, Clickjacking, MIME sniffing, XSS korumasi
+- **CORS:** Sadece izin verilen origin'ler
 - **Girdi Dogrulama:** Sunucu tarafinda tip, uzunluk ve format kontrolu
 - **Prepared Statements:** SQL injection onleme
 - **HTML Encoding:** XSS onleme icin cikti temizleme
+- **Double-Submit Onleme:** POST-only, 1 saniye cooldown
+- **Race Condition Onleme:** ON CONFLICT ile ayni anda coklu istek korumasi
+
+---
+
+## SEO & Deploy
+
+- **Meta etiketleri:** title, description, og:image, og:url, og:site_name, canonical
+- **JSON-LD:** Person + WebSite structured data
+- **Sitemap:** `/sitemap.xml` (arama motorlari icin)
+- **Favicon:** SVG (tarayicilar), ICO (arama motorlari), Apple Touch Icon (mobil)
+- **Google Site Verification:** `0GoTL9hCgwktaTNu2t-vsFf9aqm-kxb9xwoGWEwZyS0`
+- **OnRender:** Backend deploy (uyku onlemeli ping)
+- **UptimeRobot:** 5 dakikada ping (OnRender uyumasini onler)
+
+---
+
+## Iletisim
+
+- **GitHub:** [github.com/fojizen](https://github.com/fojizen)
+- **LinkedIn:** [linkedin.com/in/fojizen](https://www.linkedin.com/in/fojizen/)
+- **Instagram:** [instagram.com/fojizen](https://www.instagram.com/fojizen/)
+- **Portfolio:** [fojizen.vercel.app](https://fojizen.vercel.app)
 
 ---
 
