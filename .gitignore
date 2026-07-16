@@ -18,3 +18,10 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# Screenshots (personal, not for repo)
+screenshots/
+
+# Database files
+*.sqlite
+*.sqlite3
