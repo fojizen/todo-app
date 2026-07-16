@@ -87,7 +87,7 @@
       'edit.cat':'Kategori','edit.tags':'Etiketler','edit.done':'Tamamlandi','edit.delete':'Sil','edit.cancel':'Iptal','edit.save':'Kaydet','modal.close':'Kapat',
       'prio.high':'Yuksek','prio.medium':'Orta','prio.low':'Dusuk',
       'welcome.prefix':'Hos geldin,',
-      'toast.loginOk':'Giris basarili!','toast.registerOk':'Kayit basarili!','toast.logout':'Cikis yapildi',
+      'toast.loginOk':'Giris basarili!','toast.registerOk':'Kayit basarili!','toast.verifySent':'Dogrulama e-postasi gonderildi!','toast.logout':'Cikis yapildi',
       'toast.taskAdd':'Gorev eklendi','toast.taskEdit':'Gorev guncellendi','toast.taskDel':'Gorev silindi',
       'toast.updated':'Guncellendi','toast.userDel':'Kullanici silindi','toast.userEdit':'Kullanici guncellendi',
       'toast.banRemoved':'Ban kaldirildi','toast.banned':'Kullanici banlandi',
@@ -173,7 +173,7 @@
       'edit.cat':'Category','edit.tags':'Tags','edit.done':'Completed','edit.delete':'Delete','edit.cancel':'Cancel','edit.save':'Save','modal.close':'Close',
       'prio.high':'High','prio.medium':'Medium','prio.low':'Low',
       'welcome.prefix':'Welcome,',
-      'toast.loginOk':'Login successful!','toast.registerOk':'Registration successful!','toast.logout':'Logged out',
+      'toast.loginOk':'Login successful!','toast.registerOk':'Registration successful!','toast.verifySent':'Verification email sent!','toast.logout':'Logged out',
       'toast.taskAdd':'Task added','toast.taskEdit':'Task updated','toast.taskDel':'Task deleted',
       'toast.updated':'Updated','toast.userDel':'User deleted','toast.userEdit':'User updated',
       'toast.banRemoved':'Ban removed','toast.banned':'User banned',
@@ -718,12 +718,12 @@
     }).then(function (data) {
       if (!data || !data.ok) return;
       lastRegisteredUsername = data.username || username;
-      setBtnSuccess(btn, function () {
-        var verifyModal = document.getElementById('verifyModal');
-        var emailDisplay = document.getElementById('verifyEmailDisplay');
-        if (emailDisplay) emailDisplay.textContent = email;
-        if (verifyModal) verifyModal.showModal();
-      });
+      showToast(t('toast.verifySent'), 'success');
+      var verifyModal = document.getElementById('verifyModal');
+      var emailDisplay = document.getElementById('verifyEmailDisplay');
+      if (emailDisplay) emailDisplay.textContent = email;
+      if (verifyModal) verifyModal.showModal();
+      setBtnSuccess(btn);
     }).catch(function (err) {
       if (err.message !== 'taken') {
         var msg = err.message || t('toast.error');
