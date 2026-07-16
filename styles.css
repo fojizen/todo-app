@@ -455,7 +455,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .modal-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--border)}
 .modal-foot-right{display:flex;gap:8px}
 .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.verify-modal-box{padding:40px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.verify-modal-box{padding:40px 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2)}
 .verify-icon{margin-bottom:20px}
 .verify-modal-box h2{font-size:1.25rem;font-weight:700;margin:0 0 10px;text-align:center;color:var(--text)}
 .verify-modal-box p{color:var(--muted);font-size:.875rem;margin:0 0 8px;line-height:1.6;text-align:center}
