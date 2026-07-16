@@ -491,9 +491,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-hero-visual{margin-top:40px}
   .lp-mockup-float{display:none}
 
-  .toast-container{top:auto !important;bottom:10px !important;padding-bottom:var(--safe-bottom)}
-  .toast{transform:translateY(120%)}
-  .toast.show{transform:translateY(0)}
+  .toast-container{top:56px !important;right:12px !important;bottom:auto !important;left:auto !important;padding-top:var(--safe-top)}
+  .toast{transform:translateX(120%)}
+  .toast.show{transform:translateX(0)}
 
   .app-header{padding:10px 16px;padding-top:calc(10px + var(--safe-top))}
   .header-left h1{font-size:.95rem}
