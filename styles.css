@@ -252,7 +252,11 @@ html.loading .page{display:none!important}
 .lp-footer-contact-label{font-size:.8125rem;font-weight:600;color:var(--muted);margin-right:2px}
 .lp-footer-links a{color:var(--muted);transition:color .2s,translate .2s}
 .lp-footer-links a:hover{color:var(--accent);translate:0 -2px}
-.page-footer-copy{text-align:center;font-size:.75rem;color:var(--muted);padding:16px 24px;border-top:1px solid var(--border);margin-top:auto}
+.page-footer{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid var(--border);margin-top:auto}
+.page-footer-links{display:flex;align-items:center;gap:14px}
+.page-footer-links a{color:var(--muted);transition:color .2s}
+.page-footer-links a:hover{color:var(--accent)}
+.page-footer-copy{text-align:center;font-size:.75rem;color:var(--muted)}
 .auth-footer-copy{text-align:center;font-size:.75rem;color:var(--muted);padding:14px 24px;z-index:2;position:relative;opacity:.6}
 
 /* Scroll Reveal */
