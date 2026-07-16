@@ -6,6 +6,7 @@ const cors = require('cors');
 const crypto = require('crypto');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -160,12 +161,17 @@ function adminOnly(req, res, next) {
 }
 
 // ── Email Verification ─────────────────────────────────
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || 'TodoApp <onboarding@resend.dev>';
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_PASS = process.env.GMAIL_PASS;
+
+const mailTransporter = (GMAIL_USER && GMAIL_PASS) ? nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: GMAIL_USER, pass: GMAIL_PASS }
+}) : null;
 
 async function sendVerificationEmail(email, token) {
-  if (!RESEND_API_KEY) {
-    console.warn('RESEND_API_KEY not set, skipping verification email');
+  if (!mailTransporter) {
+    console.warn('GMAIL_USER/GMAIL_PASS not set, skipping verification email');
     return false;
   }
   const verifyUrl = FRONTEND_URL + '/api/verify-email/' + token;
@@ -177,16 +183,12 @@ async function sendVerificationEmail(email, token) {
     '<p style="text-align:center;color:#9ca3af;font-size:13px">Bu e-postayi sen talep etmediysen, gonemseme.</p>' +
     '</div>';
   try {
-    const resp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: FROM_EMAIL, to: email, subject: 'E-postani Dogrula - TodoApp', html })
+    await mailTransporter.sendMail({
+      from: '"TodoApp" <' + GMAIL_USER + '>',
+      to: email,
+      subject: 'E-postani Dogrula - TodoApp',
+      html: html
     });
-    if (!resp.ok) {
-      const err = await resp.text();
-      console.error('Resend error:', err);
-      return false;
-    }
     return true;
   } catch (e) {
     console.error('Email send failed:', e.message);
