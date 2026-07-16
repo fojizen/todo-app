@@ -268,7 +268,7 @@ app.post('/api/tasks', auth, async (req, res) => {
     res.json(task);
   } catch (e) {
     console.error('Task create error:', e.stack);
-    res.status(500).json({ error: 'Sunucu hatasi' });
+    res.status(500).json({ error: 'Sunucu hatasi', detail: e.message });
   }
 });
 
