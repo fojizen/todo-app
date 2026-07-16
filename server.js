@@ -291,7 +291,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     const user = result.rows[0];
-    await sendVerificationEmail(email.trim().toLowerCase(), verificationToken);
+    sendVerificationEmail(email.trim().toLowerCase(), verificationToken).catch(function (e) { console.error('Verify email failed:', e.message); });
     res.json({ ok: true, pendingVerification: true, username: user.username });
   } catch (e) {
     console.error('Register error:', e.stack);
