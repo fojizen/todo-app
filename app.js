@@ -442,7 +442,13 @@
     var next = document.getElementById(name);
     if (current === next) return;
     showLoader();
-    setTimeout(function () { showPage(name); }, 400);
+    var startTime = Date.now();
+    requestAnimationFrame(function () {
+      showPage(name, true);
+      var elapsed = Date.now() - startTime;
+      var remaining = Math.max(0, 350 - elapsed);
+      setTimeout(function () { hideLoader(); }, remaining);
+    });
   }
 
   function showPage(name, noAnim) {
