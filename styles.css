@@ -354,7 +354,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .task-list::-webkit-scrollbar{width:4px}
 .task-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-.task-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);transition:all var(--tr);contain:layout style;touch-action:pan-y}
+.task-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);transition:all var(--tr);contain:layout style;touch-action:pan-y pinch-zoom}
 .task-item:hover{border-color:var(--border2);background:var(--card-h)}
 .task-item.completed{opacity:.5}
 .task-item.overdue{border-color:var(--red)}
@@ -524,4 +524,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .admin-table th,.admin-table td{padding:6px 8px;font-size:.75rem}
   .auth-card{padding:24px}
   .modal-body{padding:16px}
+}
+
+/* ── Print ── */
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  .task-item { break-inside: avoid; border: 1px solid #ccc !important; }
+  nav, .btn, .btn-icon, .theme-toggle, .toast-container, .modal, canvas, #particleCanvas { display: none !important; }
+  .task-list { max-height: none !important; overflow: visible !important; }
 }

@@ -45,7 +45,7 @@
       'how.3.title':'Tamamla ve Takip Et','how.3.desc':'Gorevlerini isaretle, istatistiklerini gor, surekli kendini gelistir.',
       'tech.tag':'Teknoloji','tech.title':'Modern,<br><span class="lp-gradient-text">hafif, guclu.</span>',
       'tech.sub':'Agir framework\'ler yok. Sadece iyi yazilmis, anlasilabilir kod.',
-      'tech.1':'Framework yok, saf performans','tech.2':'Hafif, hizli backend','tech.3':'Harici DB gerektirmez','tech.4':'Guvenli kimlik dogrulama',
+      'tech.1':'Framework yok, saf performans','tech.2':'Hafif, hizli backend','tech.3':'Guvenli ve hizli veritabani','tech.4':'Guvenli kimlik dogrulama',
       'cta.title':'Gorevlerine basla,<br><span class="lp-gradient-text">bugun.</span>',
       'cta.sub':'Ucretsiz kayit ol, hemen gorevlerini yonetmeye basla.','cta.btn':'Hemen Kayit Ol',
       'cta.title loggedIn':'Gorevlerini yonet,<br><span class="lp-gradient-text">hemen basla.</span>',
@@ -79,7 +79,7 @@
       'adminEdit.pw':'Yeni Sifre (bos birakilirsa degismez)','adminEdit.pw.ph':'En az 6 karakter',
       'adminEdit.role':'Rol','adminEdit.status':'Durum','adminEdit.cancel':'Iptal','adminEdit.save':'Kaydet',
       'edit.title':'Gorev Duzenle','edit.text':'Gorev','edit.prio':'Oncelik','edit.date':'Bitis',
-      'edit.cat':'Kategori','edit.tags':'Etiketler','edit.done':'Tamamlandi','edit.delete':'Sil','edit.cancel':'Iptal','edit.save':'Kaydet',
+      'edit.cat':'Kategori','edit.tags':'Etiketler','edit.done':'Tamamlandi','edit.delete':'Sil','edit.cancel':'Iptal','edit.save':'Kaydet','modal.close':'Kapat',
       'prio.high':'Yuksek','prio.medium':'Orta','prio.low':'Dusuk',
       'welcome.prefix':'Hos geldin,',
       'toast.loginOk':'Giris basarili!','toast.registerOk':'Kayit basarili!','toast.logout':'Cikis yapildi',
@@ -88,7 +88,7 @@
       'toast.banRemoved':'Ban kaldirildi','toast.banned':'Kullanici banlandi',
       'toast.noCompleted':'Tamamlanan gorev yok','toast.clearDone':' tamamlanan gorev silindi',
       'toast.noTask':'Gorev eklenemedi','toast.error':'Bir hata olustu',
-      'toast.theme':'Tema','theme.system':'Sistem','theme.dark':'Koyu','theme.light':'Acik',
+      'toast.theme':'Tema','theme.toggle':'Tema degistir','theme.system':'Sistem','theme.dark':'Koyu','theme.light':'Acik',
       'confirm.deleteTask':'Bu gorevi silmek istediginize emin misiniz?',
       'confirm.clearDone':' tamamlanan gorev silinecek. Emin misiniz?',
       'confirm.banUser':' banlansin mi?','confirm.unbanUser':' ban kaldirilsin mi?',
@@ -126,7 +126,7 @@
       'how.3.title':'Complete & Track','how.3.desc':'Mark tasks, view stats, keep improving.',
       'tech.tag':'Technology','tech.title':'Modern,<br><span class="lp-gradient-text">lightweight, powerful.</span>',
       'tech.sub':'No heavy frameworks. Just well-written, understandable code.',
-      'tech.1':'No framework, pure performance','tech.2':'Lightweight, fast backend','tech.3':'No external DB required','tech.4':'Secure authentication',
+      'tech.1':'No framework, pure performance','tech.2':'Lightweight, fast backend','tech.3':'Fast and secure database','tech.4':'Secure authentication',
       'cta.title':'Start your tasks,<br><span class="lp-gradient-text">today.</span>',
       'cta.sub':'Sign up for free, start managing your tasks now.','cta.btn':'Sign Up Now',
       'cta.title loggedIn':'Manage your tasks,<br><span class="lp-gradient-text">get started.</span>',
@@ -160,7 +160,7 @@
       'adminEdit.pw':'New Password (leave blank to keep)','adminEdit.pw.ph':'At least 6 characters',
       'adminEdit.role':'Role','adminEdit.status':'Status','adminEdit.cancel':'Cancel','adminEdit.save':'Save',
       'edit.title':'Edit Task','edit.text':'Task','edit.prio':'Priority','edit.date':'Due',
-      'edit.cat':'Category','edit.tags':'Tags','edit.done':'Completed','edit.delete':'Delete','edit.cancel':'Cancel','edit.save':'Save',
+      'edit.cat':'Category','edit.tags':'Tags','edit.done':'Completed','edit.delete':'Delete','edit.cancel':'Cancel','edit.save':'Save','modal.close':'Close',
       'prio.high':'High','prio.medium':'Medium','prio.low':'Low',
       'welcome.prefix':'Welcome,',
       'toast.loginOk':'Login successful!','toast.registerOk':'Registration successful!','toast.logout':'Logged out',
@@ -169,7 +169,7 @@
       'toast.banRemoved':'Ban removed','toast.banned':'User banned',
       'toast.noCompleted':'No completed tasks','toast.clearDone':' completed tasks deleted',
       'toast.noTask':'Could not add task','toast.error':'An error occurred',
-      'toast.theme':'Theme','theme.system':'System','theme.dark':'Dark','theme.light':'Light',
+      'toast.theme':'Theme','theme.toggle':'Switch theme','theme.system':'System','theme.dark':'Dark','theme.light':'Light',
       'confirm.deleteTask':'Are you sure you want to delete this task?',
       'confirm.clearDone':' completed tasks will be deleted. Are you sure?',
       'confirm.banUser':' will be banned. Continue?','confirm.unbanUser':' ban will be removed. Continue?',
@@ -278,15 +278,32 @@
   }
 
   /* ── API ── */
+  var _pendingTasks = {};
   function api(method, path, body) {
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    var key = method + ':' + path;
+    if (method === 'POST' || method === 'PUT') {
+      if (_pendingTasks[key]) return Promise.reject(new Error('Islem devam ediyor'));
+      _pendingTasks[key] = true;
+      setTimeout(function () { delete _pendingTasks[key]; }, 2000);
+    }
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
     if (authToken) opts.headers['Authorization'] = 'Bearer ' + authToken;
     if (body) opts.body = JSON.stringify(body);
     return fetch(API + path, opts).then(function (res) {
+      var ct = res.headers.get('content-type') || '';
+      if (ct.indexOf('application/json') === -1) {
+        if (!res.ok) throw new Error('Sunucu hatasi (' + res.status + ')');
+        return {};
+      }
       return res.json().then(function (data) {
         if (!res.ok) throw new Error(data.error || 'Istek basarisiz');
         return data;
       });
+    }).catch(function (err) {
+      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+        throw new Error('Internet baglantisi yok');
+      }
+      throw err;
     });
   }
 
@@ -377,7 +394,6 @@
   });
 
   /* ── Page Navigation ── */
-  var clickX = 50, clickY = 50;
 
   function resetHamburgerNav() {
     var links = document.querySelector('.lp-nav-links');
@@ -450,10 +466,20 @@
     loadTasks().then(function () {
       showPage('mainPage', true);
       render();
-    }).catch(function () {
-      authToken = null;
-      localStorage.removeItem('authToken');
-      showPage('loginPage', true);
+    }).catch(function (err) {
+      if (err.message === 'Internet baglantisi yok') {
+        showToast('Internet baglantisi yok', 'error');
+        return;
+      }
+      if (err.message === 'Token gerekli' || err.message === 'Gecersiz token' || err.message === 'Kullanici bulunamadi') {
+        authToken = null;
+        localStorage.removeItem('authToken');
+        currentUser = null;
+        currentRole = null;
+        showPage('loginPage', true);
+      } else {
+        showToast(err.message || 'Bir hata olustu', 'error');
+      }
     });
   }
 
@@ -563,7 +589,7 @@
     statusEl.textContent = t('err.checking');
     statusEl.className = 'form-hint checking';
     usernameTimer = setTimeout(function () {
-      api('GET', '/check-username/' + val).then(function (res) {
+      api('GET', '/check-username/' + encodeURIComponent(val)).then(function (res) {
         statusEl.textContent = '"' + val + '"' + t(res.available ? 'err.available' : 'err.taken');
         statusEl.className = 'form-hint ' + (res.available ? 'success' : 'error');
       }).catch(function () { statusEl.textContent = ''; statusEl.className = 'form-hint'; });
@@ -607,7 +633,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = t('err.invalidEmail'); return; }
     if (!terms) { errEl.textContent = t('err.acceptTerms'); return; }
     setBtnLoading(btn, true);
-    api('GET', '/check-username/' + username).then(function (check) {
+      api('GET', '/check-username/' + encodeURIComponent(username)).then(function (check) {
       if (!check.available) {
         var st = document.getElementById('regUsernameStatus');
         st.textContent = '"' + username + '"' + t('err.usernameTaken');
@@ -639,6 +665,7 @@
   /* Logout button */
   var logoutBtnEl = document.getElementById('logoutBtn');
   if (logoutBtnEl) logoutBtnEl.addEventListener('click', function () {
+    api('POST', '/logout').catch(function () {});
     currentUser = null; currentRole = null; authToken = null;
     localStorage.removeItem('authToken');
     todos = [];
@@ -799,7 +826,7 @@
       var pl = PRI_LABELS[task.priority] || task.priority;
       return '<li class="task-item' + (task.done ? ' completed' : '') + (od ? ' overdue' : '') + (ds ? ' due-soon' : '') +
         '" data-id="' + task.id + '" draggable="true">' +
-        '<div class="task-content"><label class="task-check"><input type="checkbox"' + (task.done ? ' checked' : '') + '><span class="checkmark"></span></label>' +
+        '<div class="task-content"><label class="task-check"><input type="checkbox"' + (task.done ? ' checked' : '') + ' aria-label="' + esc(task.text) + '"><span class="checkmark"></span></label>' +
         '<div class="task-main"><span class="task-text">' + esc(task.text) + '</span><div class="task-meta">' +
         (task.dueDate ? '<span class="task-badge badge-date' + (od ? ' overdue' : ds ? ' due-soon' : '') + '">' + fmtDate(task.dueDate) + '</span>' : '') +
         '<span class="task-badge badge-priority" style="background:' + pc + '15;color:' + pc + ';border-color:' + pc + '30">' + pl + '</span>' +
@@ -1258,5 +1285,10 @@
       showPage('landingPage', true);
     }
   }
+
+  window.addEventListener('unhandledrejection', function (e) {
+    console.error('Unhandled promise rejection:', e.reason);
+    e.preventDefault();
+  });
 
 })();
