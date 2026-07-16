@@ -286,7 +286,8 @@ html.loading .page{display:none!important}
 
 .auth-back{position:absolute;top:20px;left:20px;z-index:10;display:flex;align-items:center;gap:6px;color:var(--text2);font-size:.875rem;font-weight:500;transition:color var(--tr);padding-top:var(--safe-top)}
 .auth-back:hover{color:var(--text)}
-.auth-lang{position:absolute;top:20px;right:20px;z-index:10;padding-top:var(--safe-top)}
+.auth-lang{position:absolute;top:20px;right:60px;z-index:10;padding-top:var(--safe-top)}
+.auth-theme-toggle{position:absolute;top:20px;right:20px;z-index:10;padding-top:var(--safe-top)}
 
 .auth-container{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;flex:1;padding:24px;padding-bottom:48px}
 .auth-card{width:100%;max-width:400px;background:var(--card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:var(--r2);padding:32px;box-shadow:var(--shadow),0 0 80px rgba(124,92,255,.08);animation:authCardIn .6s cubic-bezier(.16,1,.3,1) both}

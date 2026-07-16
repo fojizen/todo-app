@@ -776,9 +776,11 @@
   var themeToggle = document.getElementById('themeToggle');
   var themeToggleAdmin = document.getElementById('themeToggleAdmin');
   var lpThemeToggle = document.getElementById('lpThemeToggle');
+  var authThemeToggle = document.getElementById('authThemeToggle');
   if (themeToggle) themeToggle.addEventListener('click', cycleTheme);
   if (themeToggleAdmin) themeToggleAdmin.addEventListener('click', cycleTheme);
   if (lpThemeToggle) lpThemeToggle.addEventListener('click', cycleTheme);
+  if (authThemeToggle) authThemeToggle.addEventListener('click', cycleTheme);
 
   /* ── Landing Page ── */
   var landingInitialized = false;
