@@ -479,7 +479,6 @@
       window.scrollTo(0, 0);
     }
     var toastEl = document.getElementById('toastContainer');
-    if (toastEl) toastEl.style.top = (name === 'loginPage' ? '70px' : '20px');
     try { localStorage.setItem('lastPage', name); } catch (e) {}
   }
 
