@@ -18,7 +18,11 @@ if (!process.env.JWT_SECRET) {
 }
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'fij9823r82fkowpefpowflwfw211dawdFDQ';
+if (!process.env.ADMIN_PASSWORD) {
+  console.error('FATAL: ADMIN_PASSWORD env var is required');
+  process.exit(1);
+}
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://fojizen-todo-app.onrender.com';
 const isProd = process.env.NODE_ENV === 'production';
 

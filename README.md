@@ -73,14 +73,6 @@
 - Guvenli sifre depolama (bcrypt, 12 rounds, async)
 - Sayfa yenileme durumunda son sayfayi hatirlama
 
-### Admin Paneli
-- Kullanici listesi (ID, kullanici adi, e-posta, rol, durum, son giris, gorev sayisi)
-- Kullanici duzenleme (kullanici adi, e-posta, sifre, rol, ban durumu)
-- Kullanici banlama / ban kaldirma
-- Kullanici silme (tum gorevleriyle birlikte)
-- Kendini silme engeli
-- Rol yonetimi: admin / user
-
 ### Tasarim & Tema
 - Koyu / Acik / Sistem temasi
 - Partikul animasyonlu arka plan (Canvas API)
@@ -158,8 +150,8 @@ Sunucu varsayilan olarak `http://localhost:3000` adresinde baslar.
 ```
 todo-app/
 ├── server.js          # Express backend, API rotalari, DB yardimcilari
-├── app.js             # Frontend JavaScript (IIFE, API, UI, admin paneli)
-├── index.html         # Ana HTML sayfasi (landing, login, main, admin, modallar)
+├── app.js             # Frontend JavaScript (IIFE, API, UI)
+├── index.html         # Ana HTML sayfasi (landing, login, main, modallar)
 ├── styles.css         # CSS stilleri (tema, responsive, animasyonlar)
 ├── package.json       # Bagimliliklar ve scriptler
 ├── favicon.svg        # SVG favicon (mor tik ikonu)
@@ -201,15 +193,6 @@ Tum API istekleri `/api` on ekini gerektirir.
 | `DELETE` | `/api/tasks/:id` | Gorevi sil |
 | `PUT` | `/api/tasks/reorder` | Gorevleri yeniden sirala |
 
-### Admin (admin token gerekli)
-
-| Method | Endpoint | Aciklama |
-|--------|----------|----------|
-| `GET` | `/api/admin/users` | Tum kullanicilari listele |
-| `GET` | `/api/admin/users/:id` | Kullanici detayi |
-| `PUT` | `/api/admin/users/:id` | Kullanici guncelle (rol, ban, sifre) |
-| `DELETE` | `/api/admin/users/:id` | Kullanici sil |
-
 ---
 
 ## Cevresel Degiskenler
@@ -219,7 +202,7 @@ Tum API istekleri `/api` on ekini gerektirir.
 | `PORT` | Sunucu portu | Hayir (varsayilan: 3000) |
 | `DATABASE_URL` | PostgreSQL connection string | Evet |
 | `JWT_SECRET` | JWT imza anahtari (minimum 64 karakter) | Evet |
-| `ADMIN_PASSWORD` | Varsayilan admin sifresi | Evet |
+| `ADMIN_PASSWORD` | Admin sifresi | Evet |
 | `FRONTEND_URL` | Frontend URL'si (CORS icin) | Hayir (varsayilan: localhost:3000) |
 | `NODE_ENV` | Ortam (`production` / `development`) | Hayir (varsayilan: development) |
 
@@ -235,7 +218,7 @@ Tum API istekleri `/api` on ekini gerektirir.
 | username | TEXT | Benzersiz kullanici adi |
 | email | TEXT | E-posta adresi |
 | passwordhash | TEXT | bcrypt ile hashlenmis sifre |
-| role | TEXT | `admin` veya `user` |
+| role | TEXT | Kullanici rolu |
 | banned | BOOLEAN | `true`: banli, `false`: aktif |
 | lastlogin | TEXT | Son giris tarihi |
 | createdat | TEXT | Kayit tarihi |
