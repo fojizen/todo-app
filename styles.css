@@ -484,6 +484,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-hamburger{display:flex}
   .lp-mobile-tools{display:flex}
   .lp-mobile-right{display:flex}
+  .lp-nav-actions .lang-toggle,.lp-nav-actions .btn-icon{display:none !important}
+  .lp-nav-actions{gap:0 !important}
   .lp-section{padding:60px 0}
   .lp-features-grid{grid-template-columns:1fr}
   .lp-tech-grid{grid-template-columns:1fr}
@@ -521,6 +523,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-hamburger{display:flex}
   .lp-mobile-tools{display:flex}
   .lp-mobile-right{display:flex}
+  .lp-nav-actions .lang-toggle,.lp-nav-actions .btn-icon{display:none !important}
+  .lp-nav-actions{gap:0 !important}
   .lp-features-grid{grid-template-columns:repeat(2,1fr)}
   .task-actions{opacity:1}
 }
