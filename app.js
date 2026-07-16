@@ -712,7 +712,7 @@
         setBtnLoading(btn, false);
         return Promise.reject(new Error('taken'));
       }
-      return api('POST', '/register', { username: username, email: email, password: password });
+      return api('POST', '/register', { username: username, email: email, password: password, lang: currentLang });
     }).then(function (data) {
       if (!data || !data.ok) return;
       lastRegisteredUsername = data.username || username;
@@ -741,7 +741,7 @@
     if (!lastRegisteredUsername) return;
     resendBtn.disabled = true;
     resendBtn.textContent = '...';
-    api('POST', '/resend-verification', { username: lastRegisteredUsername }).then(function () {
+    api('POST', '/resend-verification', { username: lastRegisteredUsername, lang: currentLang }).then(function () {
       showToast(t('toast.verificationSent'), 'success');
     }).catch(function (err) {
       showToast(err.message || t('toast.error'), 'error');

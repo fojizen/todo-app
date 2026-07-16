@@ -164,24 +164,41 @@ function adminOnly(req, res, next) {
 // ── Email Verification ─────────────────────────────────
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-async function sendVerificationEmail(email, token) {
+async function sendVerificationEmail(email, token, lang) {
   if (!RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not set, skipping verification email');
     return false;
   }
   const verifyUrl = FRONTEND_URL + '/api/verify-email/' + token;
-  const html = '<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px">' +
-    '<div style="text-align:center;margin-bottom:24px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>' +
-    '<h2 style="text-align:center;color:#1a1a2e;margin:0 0 8px">E-postani Dogrula</h2>' +
-    '<p style="text-align:center;color:#6b7280;margin:0 0 24px;font-size:15px">Hesabini aktif etmek icin asagidaki butona tikla.</p>' +
-    '<div style="text-align:center;margin-bottom:24px"><a href="' + verifyUrl + '" style="display:inline-block;padding:12px 32px;background:#7c5cff;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">E-postami Dogrula</a></div>' +
-    '<p style="text-align:center;color:#9ca3af;font-size:13px">Bu e-postayi sen talep etmediysen, gonemseme.</p>' +
-    '</div>';
+  var isTr = lang === 'tr';
+  var title = isTr ? 'E-postani Dogrula' : 'Verify Your Email';
+  var desc = isTr ? 'Hesabini aktif etmek icin asagidaki butona tikla.' : 'Click the button below to activate your account.';
+  var btn = isTr ? 'E-postami Dogrula' : 'Verify My Email';
+  var note = isTr ? 'Bu e-postayi sen talep etmediysen, gonemseme.' : 'If you didn\'t request this, ignore this email.';
+  var subject = 'fojizen | TodoApp - ' + title;
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head><body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif">' +
+    '<div style="max-width:480px;margin:0 auto;padding:40px 24px">' +
+    '<div style="text-align:center;margin-bottom:24px">' +
+      '<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:#7c5cff;border-radius:10px">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>' +
+        '<span style="color:#fff;font-weight:700;font-size:16px">fojizen | TodoApp</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="background:#fff;border-radius:16px;padding:40px 32px;text-align:center;border:1px solid #e5e7eb">' +
+      '<h1 style="font-size:22px;font-weight:700;color:#1a1a2e;margin:0 0 12px">' + title + '</h1>' +
+      '<p style="color:#6b7280;font-size:15px;margin:0 0 28px;line-height:1.6">' + desc + '</p>' +
+      '<a href="' + verifyUrl + '" style="display:inline-block;padding:14px 36px;background:#7c5cff;color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px">' + btn + '</a>' +
+      '<p style="color:#9ca3af;font-size:13px;margin:28px 0 0">' + note + '</p>' +
+    '</div>' +
+    '<p style="text-align:center;color:#d1d5db;font-size:11px;margin-top:24px">&copy; 2026 fojizen</p>' +
+    '</div>' +
+    '<style>@media(prefers-color-scheme:dark){body{background:#0f0f14!important}div[style*="background:#fff"]{background:#1a1a2e!important;border-color:#2d2d44!important}h1[style*="color:#1a1a2e"]{color:#e5e7eb!important}p[style*="color:#6b7280"]{color:#9ca3af!important}p[style*="color:#9ca3af"]{color:#6b7280!important}}</style>' +
+    '</body></html>';
   try {
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'TodoApp <onboarding@resend.dev>', to: email, subject: 'E-postani Dogrula - TodoApp', html })
+      body: JSON.stringify({ from: 'fojizen | TodoApp <onboarding@resend.dev>', to: email, subject: subject, html })
     });
     if (!resp.ok) {
       const err = await resp.text();
@@ -215,7 +232,7 @@ app.get('/api/verify-email/:token', async (req, res) => {
 
 app.post('/api/resend-verification', async (req, res) => {
   try {
-    const { username } = req.body || {};
+    const { username, lang } = req.body || {};
     if (!username) return res.status(400).json({ error: 'Kullanici adi gerekli' });
     if (rateLimit('resend:' + req.ip, 3, 60000)) return res.status(429).json({ error: 'Cok fazla istek. 1 dk bekleyin.' });
 
@@ -225,7 +242,7 @@ app.post('/api/resend-verification', async (req, res) => {
 
     const newToken = crypto.randomBytes(32).toString('hex');
     await run('UPDATE users SET verificationtoken = $1 WHERE id = $2', [newToken, user.id]);
-    const sent = await sendVerificationEmail(user.email, newToken);
+    const sent = await sendVerificationEmail(user.email, newToken, lang);
     if (!sent) return res.status(500).json({ error: 'E-posta gonderilemedi' });
     res.json({ ok: true });
   } catch (e) {
@@ -267,7 +284,7 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body || {};
+    const { username, email, password, lang } = req.body || {};
     if (!username || !email || !password) return res.status(400).json({ error: 'Tum alanlar gerekli' });
     if (rateLimit('register:' + req.ip, 5, 60000)) return res.status(429).json({ error: 'Cok fazla istek' });
 
@@ -294,7 +311,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     const user = result.rows[0];
-    sendVerificationEmail(email.trim().toLowerCase(), verificationToken).catch(function (e) { console.error('Verify email failed:', e.message); });
+    sendVerificationEmail(email.trim().toLowerCase(), verificationToken, lang).catch(function (e) { console.error('Verify email failed:', e.message); });
     res.json({ ok: true, pendingVerification: true, username: user.username });
   } catch (e) {
     console.error('Register error:', e.stack);
