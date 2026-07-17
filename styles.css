@@ -391,13 +391,13 @@ html.loading .page{display:none!important}
 
 /* Main Page Background Orbs */
 .main-bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.main-bg-orbs::before{content:'';position:absolute;top:0;left:0;right:0;height:40vh;background:linear-gradient(180deg,rgba(124,92,255,.06) 0%,transparent 100%);pointer-events:none}
-.main-orb{position:absolute;border-radius:50%}
-.main-orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,92,255,.2) 0%,transparent 70%);filter:blur(80px);top:-8%;right:-5%;animation:orbFloat 20s ease-in-out infinite}
-.main-orb-2{width:450px;height:450px;background:radial-gradient(circle,rgba(6,182,212,.15) 0%,transparent 70%);filter:blur(80px);bottom:5%;left:-8%;animation:orbFloat 25s ease-in-out infinite reverse}
-.main-orb-3{width:350px;height:350px;background:radial-gradient(circle,rgba(168,85,247,.15) 0%,transparent 70%);filter:blur(80px);top:45%;left:35%;animation:orbFloat 18s ease-in-out infinite 5s}
-.main-orb-4{width:300px;height:300px;background:radial-gradient(circle,rgba(124,92,255,.12) 0%,transparent 70%);filter:blur(80px);top:20%;left:50%;animation:orbFloat 22s ease-in-out infinite 3s}
-.main-orb-5{width:250px;height:250px;background:radial-gradient(circle,rgba(6,182,212,.1) 0%,transparent 70%);filter:blur(60px);bottom:30%;right:10%;animation:orbFloat 15s ease-in-out infinite 7s}
+.main-bg-orbs::before{content:'';position:absolute;top:0;left:0;right:0;height:40vh;background:linear-gradient(180deg,rgba(124,92,255,.08) 0%,transparent 100%);pointer-events:none}
+.main-orb{position:absolute;border-radius:50%;opacity:.35}
+.main-orb-1{width:500px;height:500px;background:var(--accent);filter:blur(80px);top:-8%;right:-5%;animation:orbFloat 20s ease-in-out infinite}
+.main-orb-2{width:450px;height:450px;background:var(--cyan);filter:blur(80px);bottom:5%;left:-8%;animation:orbFloat 25s ease-in-out infinite reverse}
+.main-orb-3{width:350px;height:350px;background:var(--accent2);filter:blur(80px);top:45%;left:35%;animation:orbFloat 18s ease-in-out infinite 5s}
+.main-orb-4{width:300px;height:300px;background:var(--accent);filter:blur(80px);top:20%;left:50%;animation:orbFloat 22s ease-in-out infinite 3s}
+.main-orb-5{width:250px;height:250px;background:var(--cyan);filter:blur(60px);bottom:30%;right:10%;animation:orbFloat 15s ease-in-out infinite 7s}
 
 .app-main{flex:1;display:flex;flex-direction:column;padding:20px 24px;max-width:900px;width:100%;margin:0 auto;position:relative;z-index:1}
 
@@ -582,11 +582,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .toast.show{transform:translateX(0)}
 
   .app-header{padding:10px 16px;padding-top:calc(10px + var(--safe-top))}
-  .main-orb-1{width:250px;height:250px}
-  .main-orb-2{width:220px;height:220px}
-  .main-orb-3{width:180px;height:180px}
-  .main-orb-4{width:160px;height:160px}
-  .main-orb-5{width:140px;height:140px}
+  .main-orb{opacity:.4}
+  .main-orb-1{width:280px;height:280px}
+  .main-orb-2{width:240px;height:240px}
+  .main-orb-3{width:200px;height:200px}
+  .main-orb-4{width:180px;height:180px}
+  .main-orb-5{width:150px;height:150px}
   .header-left h1{font-size:.95rem}
   .header-right .btn span{display:none}
   .app-main{padding:16px}
