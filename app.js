@@ -920,7 +920,10 @@
       var overlay = document.getElementById('mobileDrawerOverlay');
       if (drawer) drawer.classList.remove('open');
       if (overlay) overlay.classList.remove('open');
-      navigateTo('loginPage');
+      navigateTo('loginPage', function () {
+        var lt = document.getElementById('loginTab');
+        if (lt) lt.click();
+      });
     });
     if (mDrawerRegister) mDrawerRegister.addEventListener('click', function () {
       mDrawerRegister.classList.add('active');
