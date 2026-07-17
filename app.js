@@ -817,18 +817,25 @@
     setTimeout(initLanding, 450);
   });
 
-  /* Logout button */
-  var logoutBtnEl = document.getElementById('logoutBtn');
-  if (logoutBtnEl) logoutBtnEl.addEventListener('click', function () {
+  /* Logout */
+  function handleLpLogout() {
     api('POST', '/logout').catch(function () {});
     currentUser = null; currentRole = null; authToken = null;
     localStorage.removeItem('authToken');
     todos = [];
     updateLandingNav();
+    var drawer = document.getElementById('mobileDrawer');
+    var overlay = document.getElementById('mobileDrawerOverlay');
+    if (drawer) drawer.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
     navigateTo('landingPage');
     setTimeout(initLanding, 450);
     showToast(t('toast.logout'), 'info');
-  });
+  }
+
+  /* Logout button */
+  var logoutBtnEl = document.getElementById('logoutBtn');
+  if (logoutBtnEl) logoutBtnEl.addEventListener('click', function () { handleLpLogout(); });
 
   /* Theme toggles */
   var themeToggle = document.getElementById('themeToggle');
