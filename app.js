@@ -829,8 +829,6 @@
   if (themeToggleAdmin) themeToggleAdmin.addEventListener('click', cycleTheme);
   if (lpThemeToggle) lpThemeToggle.addEventListener('click', cycleTheme);
   if (authThemeToggle) authThemeToggle.addEventListener('click', cycleTheme);
-  var lpDrawerThemeToggle = document.getElementById('lpDrawerThemeToggle');
-  if (lpDrawerThemeToggle) lpDrawerThemeToggle.addEventListener('click', cycleTheme);
   if (lpMobileTheme) lpMobileTheme.addEventListener('click', cycleTheme);
 
   /* ── Landing Page ── */
