@@ -215,31 +215,19 @@ html.loading .page{display:none!important}
 .lp-mock-fade{opacity:0;transform:translateX(-20px);animation:mockFade .5s ease forwards;animation-delay:calc(var(--d,0) * .1s)}
 @keyframes mockFade{to{opacity:1;transform:translateX(0)}}
 
-/* Floating Code Decorations */
+/* Floating Star Decorations */
 .lp-section{position:relative;overflow:hidden}
-.lp-section-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.lp-float-code{position:absolute;padding:10px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-family:'Fira Code',monospace;font-size:.6875rem;white-space:nowrap;opacity:.35;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.15);animation:codeFloat 18s ease-in-out infinite}
-.lp-kw{color:var(--accent);font-weight:600}
-.lp-fn{color:var(--cyan)}
-.lp-str{color:var(--green)}
-.lp-fc-1{top:8%;left:5%;animation-delay:0s;animation-duration:22s}
-.lp-fc-2{top:70%;right:3%;animation-delay:-4s;animation-duration:20s}
-.lp-fc-3{bottom:10%;left:8%;animation-delay:-8s;animation-duration:24s}
-.lp-fc-4{top:12%;right:5%;animation-delay:-2s;animation-duration:21s}
-.lp-fc-5{bottom:15%;left:3%;animation-delay:-6s;animation-duration:19s}
-.lp-fc-6{top:10%;left:2%;animation-delay:-3s;animation-duration:23s}
-.lp-fc-7{bottom:12%;right:4%;animation-delay:-7s;animation-duration:20s}
-.lp-fc-8{top:15%;right:4%;animation-delay:-1s;animation-duration:22s}
-.lp-fc-9{bottom:18%;left:4%;animation-delay:-5s;animation-duration:25s}
-.lp-fc-10{top:10%;right:3%;animation-delay:-2s;animation-duration:21s}
-.lp-fc-11{bottom:14%;left:5%;animation-delay:-9s;animation-duration:23s}
-.lp-cm{color:var(--muted)}
-@keyframes codeFloat{
-  0%,100%{transform:translateY(0) rotate(0deg)}
-  25%{transform:translateY(-18px) rotate(1deg)}
-  50%{transform:translateY(12px) rotate(-1deg)}
-  75%{transform:translateY(-8px) rotate(.5deg)}
-}
+.lp-section::before,.lp-section::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
+.lp-section::before{width:300px;height:300px;background:var(--accent);filter:blur(120px);opacity:.06;top:-80px;right:-80px}
+.lp-section::after{width:250px;height:250px;background:var(--accent2);filter:blur(100px);opacity:.05;bottom:-60px;left:-60px}
+.lp-features::after{background:var(--cyan);opacity:.05}
+.lp-tech::before{background:var(--cyan);opacity:.06}
+
+.lp-stars{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lp-star{position:absolute;width:4px;height:4px;background:var(--accent);border-radius:50%;opacity:0;animation:starTwinkle var(--dur,3s) ease-in-out infinite var(--del,0s)}
+.lp-star:nth-child(even){background:var(--accent2)}
+.lp-star:nth-child(3n){background:var(--cyan);width:3px;height:3px}
+@keyframes starTwinkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:.6;transform:scale(1)}}
 
 /* Sections */
 .lp-section{padding:100px 0}
