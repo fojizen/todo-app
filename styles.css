@@ -389,7 +389,14 @@ html.loading .page{display:none!important}
 .welcome-text{font-size:.8125rem;color:var(--text2)}
 .header-right{display:flex;align-items:center;gap:8px}
 
-.app-main{flex:1;display:flex;flex-direction:column;padding:20px 24px;max-width:900px;width:100%;margin:0 auto}
+/* Main Page Background Orbs */
+.main-bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.main-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.08}
+.main-orb-1{width:400px;height:400px;background:var(--accent);top:-5%;right:-5%;animation:orbFloat 20s ease-in-out infinite}
+.main-orb-2{width:350px;height:350px;background:var(--cyan);bottom:10%;left:-8%;animation:orbFloat 25s ease-in-out infinite reverse}
+.main-orb-3{width:300px;height:300px;background:var(--accent2);top:50%;left:40%;animation:orbFloat 18s ease-in-out infinite 5s}
+
+.app-main{flex:1;display:flex;flex-direction:column;padding:20px 24px;max-width:900px;width:100%;margin:0 auto;position:relative;z-index:1}
 
 /* Task Form */
 .task-form{margin-bottom:16px}
@@ -572,6 +579,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .toast.show{transform:translateX(0)}
 
   .app-header{padding:10px 16px;padding-top:calc(10px + var(--safe-top))}
+  .main-orb-1{width:250px;height:250px}
+  .main-orb-2{width:200px;height:200px}
+  .main-orb-3{width:180px;height:180px}
   .header-left h1{font-size:.95rem}
   .header-right .btn span{display:none}
   .app-main{padding:16px}
