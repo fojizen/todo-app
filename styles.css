@@ -216,8 +216,8 @@ html.loading .page{display:none!important}
 /* Floating Star Decorations */
 .lp-section{position:relative;overflow:visible}
 .lp-section::before,.lp-section::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
-.lp-section::before{width:300px;height:300px;background:var(--accent);filter:blur(120px);opacity:.06;top:-80px;right:-80px}
-.lp-section::after{width:250px;height:250px;background:var(--accent2);filter:blur(100px);opacity:.05;bottom:-60px;left:-60px}
+.lp-section::before{width:400px;height:400px;background:var(--accent);filter:blur(120px);opacity:.06;top:-80px;left:-80px}
+.lp-section::after{width:350px;height:350px;background:var(--accent2);filter:blur(100px);opacity:.05;bottom:-60px;right:-80px}
 .lp-features::after{background:var(--cyan);opacity:.05}
 .lp-tech::before{background:var(--cyan);opacity:.06}
 
