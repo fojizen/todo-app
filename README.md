@@ -54,10 +54,24 @@
 - Modern loader animation (rotating glow ring)
 - Responsive design (mobile, tablet, desktop, TV)
 - Zoom-compatible layout
-- TR / EN language support
+- TR / EN language support (full i18n)
 - Page transition animations
 - Enhanced options panel (modern select, date picker, tag input)
 - Footer social media links (GitHub, LinkedIn, Instagram, Portfolio)
+
+### Mobile Experience
+- Slide-in drawer navigation (swipe-to-close gesture)
+- Segmented login/register toggle in drawer
+- Language and theme toggles in drawer
+- PWA install button (hidden when already installed)
+- iOS / Android compatible animations
+
+### Landing Page
+- About fojizen section with developer profile and social links
+- Privacy Policy section (collapsible with expand animation)
+- Animated stars/sparkles in all sections
+- Smooth scroll navigation between sections
+- Clickable footer nav links
 
 ### PWA (Progressive Web App)
 - Installable on mobile (Android, iOS) and desktop
@@ -131,7 +145,7 @@ Server starts at `http://localhost:3000` by default.
 ```
 todo-app/
 ├── server.js            # Express backend, API routes, DB helpers
-├── app.js               # Frontend JavaScript (IIFE, API, UI)
+├── app.js               # Frontend JavaScript (IIFE, API, UI, i18n)
 ├── index.html           # Main HTML page (landing, login, tasks, modals)
 ├── styles.css           # CSS styles (theme, responsive, animations)
 ├── sw.js                # Service worker (PWA)
@@ -272,9 +286,11 @@ RESEND_API_KEY=re_your_resend_api_key
 ## SEO & Deployment
 
 - **Meta tags:** title, description, og:image, og:url, og:site_name, canonical
-- **JSON-LD:** Person + WebSite structured data
+- **JSON-LD:** Person (fojizen) + WebSite structured data
 - **Sitemap:** `/sitemap.xml`
 - **Favicon:** SVG (browsers), ICO (search engines), Apple Touch Icon (mobile)
+- **Privacy Policy:** Collapsible section with i18n support
+- **About Section:** Developer profile with social links
 - **OnRender:** Backend deployment (auto-sleep prevention via ping)
 - **UptimeRobot:** 5-minute ping interval (prevents OnRender sleep)
 
