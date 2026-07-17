@@ -470,7 +470,7 @@
     var loader = document.getElementById('loader');
     if (loader && !loader.classList.contains('fade-out')) {
       loader.classList.add('fade-out');
-      setTimeout(function () { if (loader.parentNode) loader.remove(); }, 600);
+      setTimeout(function () { if (loader.parentNode) loader.remove(); }, 250);
     }
   }
 
@@ -484,7 +484,7 @@
       showPage(name, true);
       if (cb) cb();
       var elapsed = Date.now() - startTime;
-      var remaining = Math.max(0, 350 - elapsed);
+      var remaining = Math.max(0, 200 - elapsed);
       setTimeout(function () { hideLoader(); }, remaining);
     });
   }
@@ -681,7 +681,7 @@
   if (authBackBtn) authBackBtn.addEventListener('click', function (e) {
     e.preventDefault();
     navigateTo('landingPage');
-    setTimeout(initLanding, 200);
+    setTimeout(initLanding, 450);
   });
 
   /* Login/Register tabs */
@@ -814,7 +814,7 @@
   if (homeBtnEl) homeBtnEl.addEventListener('click', function () {
     updateLandingNav();
     navigateTo('landingPage');
-    setTimeout(initLanding, 200);
+    setTimeout(initLanding, 450);
   });
 
   /* Logout */
@@ -829,7 +829,7 @@
     if (drawer) drawer.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
     navigateTo('landingPage');
-    setTimeout(initLanding, 200);
+    setTimeout(initLanding, 450);
     showToast(t('toast.logout'), 'info');
   }
 
