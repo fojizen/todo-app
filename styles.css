@@ -282,12 +282,19 @@ html.loading .page{display:none!important}
 .lp-privacy-section{padding:80px 0 100px}
 .lp-privacy{padding:48px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);backdrop-filter:blur(10px)}
 .lp-privacy .lp-section-tag{margin-bottom:12px}
-.lp-privacy .lp-section-title{font-size:1.6rem;margin-bottom:20px}
-.lp-privacy-content{font-size:.875rem;color:var(--text2);line-height:1.8}
-.lp-privacy-content p{margin-bottom:12px}
-.lp-privacy-content strong{color:var(--text);font-weight:600}
-.lp-privacy-content a{color:var(--accent);text-decoration:none;transition:color var(--tr)}
-.lp-privacy-content a:hover{color:var(--accent2)}
+.lp-privacy .lp-section-title{font-size:1.6rem;margin-bottom:8px}
+.lp-privacy-update{font-size:.75rem;color:var(--muted);margin-bottom:20px}
+.lp-privacy-item{margin-bottom:16px}
+.lp-privacy-item strong{display:block;font-size:.875rem;color:var(--text);font-weight:600;margin-bottom:4px}
+.lp-privacy-item p{font-size:.8125rem;color:var(--text2);line-height:1.7;margin:0}
+.lp-privacy-full{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s ease;opacity:0}
+.lp-privacy-full.open{max-height:600px;opacity:1}
+.lp-privacy-full .lp-privacy-item{border-top:1px solid var(--border);padding-top:16px}
+.lp-privacy-full .lp-privacy-item:first-child{margin-top:0}
+.lp-privacy-toggle{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:8px 0;border:none;background:none;color:var(--accent);font-family:inherit;font-size:.8125rem;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.lp-privacy-toggle svg{transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.lp-privacy-toggle.open svg{transform:rotate(180deg)}
+.lp-privacy-toggle:active{transform:scale(.96)}
 
 /* Footer */
 .lp-footer{padding:32px 0;border-top:1px solid var(--border)}
@@ -591,6 +598,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .lp-about-avatar{width:64px;height:64px}
   .lp-about-links{justify-content:center}
   .lp-privacy{padding:32px 24px}
+  .lp-privacy-full.open{max-height:800px}
   .lp-footer-inner{flex-direction:column;align-items:center;text-align:center;gap:12px}
   .lp-footer-nav{justify-content:center}
 }
