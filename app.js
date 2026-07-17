@@ -34,7 +34,7 @@
       'hero.badge':'Gorevlerini Duzene Koyma Zamani',
       'hero.title':'Yapman gereken her sey,<br><span class="lp-gradient-text">tek bir yerde.</span>',
       'hero.sub':'Gorevlerini olustur, onceliklendir, kategorilere ayir ve tamamla.<br>Guvenli, hizli ve muhtesem gorunen bir todo deneyimi.',
-      'hero.cta':'Hemen Basla','hero.more':'Daha Fazla',
+      'hero.cta':'Hemen Basla','hero.more':'Daha Fazla','hero.install':'Uygulamayi Kur',
       'hero.cta loggedIn':'Gorevlerime Git',
       'hero.stat.free':'Ucretsiz','hero.stat.access':'Erisim','hero.stat.encrypt':'Sifreleme',
       'mock.t1':'Proje dokumani hazirla','mock.t2':"API endpoint'lerini test et",'mock.t3':'Database migration yaz',
@@ -120,7 +120,7 @@
       'hero.badge':'Time to Organize Your Tasks',
       'hero.title':'Everything you need,<br><span class="lp-gradient-text">in one place.</span>',
       'hero.sub':'Create, prioritize, categorize and complete tasks.<br>A secure, fast and beautiful todo experience.',
-      'hero.cta':'Get Started','hero.more':'Learn More',
+      'hero.cta':'Get Started','hero.more':'Learn More','hero.install':'Install App',
       'hero.cta loggedIn':'My Tasks',
       'hero.stat.free':'Free','hero.stat.access':'Access','hero.stat.encrypt':'Encryption',
       'mock.t1':'Prepare project document','mock.t2':'Test API endpoints','mock.t3':'Write database migration',
@@ -1428,3 +1428,24 @@
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function () {});
 }
+
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  var installBtn = document.getElementById('lpInstallBtn');
+  if (installBtn) installBtn.style.display = '';
+});
+
+var installBtn = document.getElementById('lpInstallBtn');
+if (installBtn) installBtn.addEventListener('click', function () {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function () { deferredPrompt = null; });
+});
+
+window.addEventListener('appinstalled', function () {
+  deferredPrompt = null;
+  var installBtn = document.getElementById('lpInstallBtn');
+  if (installBtn) installBtn.style.display = 'none';
+});

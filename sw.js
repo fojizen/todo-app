@@ -1,9 +1,8 @@
-var CACHE_NAME = 'todoapp-v1';
+var CACHE_NAME = 'todoapp-v2';
 var STATIC_ASSETS = [
   '/',
   '/index.html',
   '/styles.css',
-  '/app.js',
   '/favicon.svg',
   '/favicon.ico',
   '/apple-touch-icon.png',
@@ -35,6 +34,20 @@ self.addEventListener('fetch', function (e) {
 
   if (e.request.method !== 'GET') return;
   if (url.pathname.indexOf('/api') !== -1) return;
+  if (url.pathname.indexOf('/sw.js') !== -1) return;
+
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.endsWith('.js')) {
+    e.respondWith(
+      fetch(e.request).then(function (response) {
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(function (cache) { cache.put(e.request, clone); });
+        return response;
+      }).catch(function () {
+        return caches.match(e.request);
+      })
+    );
+    return;
+  }
 
   e.respondWith(
     caches.match(e.request).then(function (cached) {
