@@ -28,7 +28,7 @@ input,select,textarea,button{font-family:inherit}
 
 /* ── Theme ── */
 :root{
-  --bg:#0a0a0f;--bg2:#11111a;--bg3:#1a1a2e;--card:rgba(26,26,46,.8);--card-h:rgba(36,36,62,.92);--surface:rgba(26,26,46,.8);
+  --bg:#0c0c18;--bg2:#12122a;--bg3:#1c1c36;--card:rgba(28,28,54,.8);--card-h:rgba(38,38,68,.92);--surface:rgba(28,28,54,.8);
   --input:#161622;--border:rgba(255,255,255,.08);--border2:rgba(124,92,255,.25);--focus:#7c5cff;
   --text:#f0f0f5;--text2:#a0a0b0;--muted:#6a6a7a;--white:#fff;
   --accent:#7c5cff;--accent2:#a855f7;--cyan:#06b6d4;--grad:linear-gradient(135deg,#7c5cff,#a855f7,#06b6d4);
