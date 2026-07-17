@@ -1512,14 +1512,18 @@ if ('serviceWorker' in navigator) {
 }
 
 var deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', function (e) {
-  e.preventDefault();
-  deferredPrompt = e;
+var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (isStandalone) {
   var installBtn = document.getElementById('lpInstallBtn');
-  if (installBtn) {
-    installBtn.classList.remove('pwa-installed');
-  }
-});
+  if (installBtn) installBtn.classList.add('pwa-installed');
+} else {
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var installBtn = document.getElementById('lpInstallBtn');
+    if (installBtn) installBtn.classList.remove('pwa-installed');
+  });
+}
 
 var installBtn = document.getElementById('lpInstallBtn');
 if (installBtn) installBtn.addEventListener('click', function () {
