@@ -429,7 +429,18 @@
     animId = requestAnimationFrame(animate);
   }
 
+  function updateHeroHeight() {
+    var hero = document.querySelector('.lp-hero');
+    if (!hero) return;
+    if (window.innerWidth >= 769) {
+      hero.style.minHeight = window.innerHeight + 'px';
+    } else {
+      hero.style.minHeight = '';
+    }
+  }
+
   window.addEventListener('resize', function () {
+    updateHeroHeight();
     if (animId) cancelAnimationFrame(animId);
     animId = null;
     var active = document.querySelector('.page.active');
@@ -497,7 +508,7 @@
         document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
         next.classList.add('active');
         setTimeout(function () { transitioning = false; }, 50);
-        if (name === 'landingPage') resetHamburgerNav();
+        if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 50); }
         if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
         else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
         window.scrollTo(0, 0);
@@ -506,7 +517,7 @@
       transitioning = false;
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
       next.classList.add('active');
-      if (name === 'landingPage') resetHamburgerNav();
+      if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 50); }
       if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
       else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
       window.scrollTo(0, 0);
