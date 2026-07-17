@@ -1,4 +1,4 @@
-var CACHE_NAME = 'todoapp-v2';
+var CACHE_NAME = 'todoapp-v3';
 var STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,8 @@ var STATIC_ASSETS = [
   '/favicon.svg',
   '/favicon.ico',
   '/apple-touch-icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
   '/manifest.json'
 ];
 
