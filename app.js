@@ -505,10 +505,10 @@
       if (userMenu) { userMenu.style.display = ''; if (usernameEl) usernameEl.textContent = currentUser; }
       if (drawerAuth) drawerAuth.style.display = 'none';
       if (drawerUser) drawerUser.style.display = '';
-      if (ctaTitle) ctaTitle.innerHTML = t('cta.title loggedIn');
-      if (ctaSub) ctaSub.textContent = t('cta.sub loggedIn');
-      if (ctaBtnText) { ctaBtnText.textContent = t('cta.btn loggedIn'); ctaBtnText.removeAttribute('data-lang-key'); }
-      if (heroCtaText) { heroCtaText.textContent = t('hero.cta loggedIn'); heroCtaText.removeAttribute('data-lang-key'); }
+      if (ctaTitle) { ctaTitle.innerHTML = t('cta.title loggedIn'); ctaTitle.setAttribute('data-lang-key', 'cta.title loggedIn'); }
+      if (ctaSub) { ctaSub.textContent = t('cta.sub loggedIn'); ctaSub.setAttribute('data-lang-key', 'cta.sub loggedIn'); }
+      if (ctaBtnText) { ctaBtnText.textContent = t('cta.btn loggedIn'); ctaBtnText.setAttribute('data-lang-key', 'cta.btn loggedIn'); }
+      if (heroCtaText) { heroCtaText.textContent = t('hero.cta loggedIn'); heroCtaText.setAttribute('data-lang-key', 'hero.cta loggedIn'); }
     } else {
       if (authBtns) authBtns.style.display = '';
       if (userMenu) userMenu.style.display = 'none';
