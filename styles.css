@@ -229,6 +229,11 @@ html.loading .page{display:none!important}
 .lp-fc-5{bottom:15%;left:3%;animation-delay:-6s;animation-duration:19s}
 .lp-fc-6{top:10%;left:2%;animation-delay:-3s;animation-duration:23s}
 .lp-fc-7{bottom:12%;right:4%;animation-delay:-7s;animation-duration:20s}
+.lp-fc-8{top:15%;right:4%;animation-delay:-1s;animation-duration:22s}
+.lp-fc-9{bottom:18%;left:4%;animation-delay:-5s;animation-duration:25s}
+.lp-fc-10{top:10%;right:3%;animation-delay:-2s;animation-duration:21s}
+.lp-fc-11{bottom:14%;left:5%;animation-delay:-9s;animation-duration:23s}
+.lp-cm{color:var(--muted)}
 @keyframes codeFloat{
   0%,100%{transform:translateY(0) rotate(0deg)}
   25%{transform:translateY(-18px) rotate(1deg)}
