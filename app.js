@@ -910,9 +910,11 @@
 
     var mDrawerLogin = document.getElementById('mobileDrawerLogin');
     var mDrawerRegister = document.getElementById('mobileDrawerRegister');
+    var mDrawerToggle = document.querySelector('.mobile-drawer-toggle');
     if (mDrawerLogin) mDrawerLogin.addEventListener('click', function () {
       mDrawerLogin.classList.add('active');
       if (mDrawerRegister) mDrawerRegister.classList.remove('active');
+      if (mDrawerToggle) mDrawerToggle.setAttribute('data-active', 'login');
       var drawer = document.getElementById('mobileDrawer');
       var overlay = document.getElementById('mobileDrawerOverlay');
       if (drawer) drawer.classList.remove('open');
@@ -922,6 +924,7 @@
     if (mDrawerRegister) mDrawerRegister.addEventListener('click', function () {
       mDrawerRegister.classList.add('active');
       if (mDrawerLogin) mDrawerLogin.classList.remove('active');
+      if (mDrawerToggle) mDrawerToggle.setAttribute('data-active', 'register');
       var drawer = document.getElementById('mobileDrawer');
       var overlay = document.getElementById('mobileDrawerOverlay');
       if (drawer) drawer.classList.remove('open');
