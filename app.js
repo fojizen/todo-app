@@ -61,6 +61,8 @@
       'footer.built':'Vanilla JS ile yapildi',
       'footer.contact':'Iletisim',
       'footer.copyright':'&copy; 2026 fojizen. Tum haklari saklidir.',
+      'about.tag':'Gelistirici','about.title':'fojizen<br><span class="lp-gradient-text">Hakkinda.</span>',
+      'about.desc':'JavaScript, Node.js ve PostgreSQL ile modern, guvenli ve performansli web uygulamalari gelistiriyorum. Vanilla JS ile framework bagimliligi olmadan, saf performans ve temiz kod odakli projeler uretiyorum.',
       'verify.title':'E-postani Dogrula','verify.desc':'Hesabini aktif etmek icin e-posta kutunu kontrol et. Dogrulama linkine tikla.',
       'verify.close':'Tamam','verify.resend':'Tekrar Gonder',
       'toast.verificationSent':'Dogrulama epostasi gonderildi',
@@ -147,6 +149,8 @@
       'footer.built':'Built with Vanilla JS',
       'footer.contact':'Contact',
       'footer.copyright':'&copy; 2026 fojizen. All rights reserved.',
+      'about.tag':'Developer','about.title':'About<br><span class="lp-gradient-text">fojizen.</span>',
+      'about.desc':'I build modern, secure and performant web applications with JavaScript, Node.js and PostgreSQL. Focused on clean code and raw performance with vanilla JS, no framework dependencies.',
       'verify.title':'Verify Your Email','verify.desc':'Check your inbox and click the verification link to activate your account.',
       'verify.close':'OK','verify.resend':'Resend',
       'toast.verificationSent':'Verification email sent',
@@ -214,7 +218,7 @@
     'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}]
   };
 
-  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
+  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'about.title':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
 
   function t(key) {
     return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.tr && i18n.tr[key]) || key;
