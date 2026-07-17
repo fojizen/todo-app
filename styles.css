@@ -165,7 +165,7 @@ html.loading .page{display:none!important}
 .mobile-drawer-danger{color:var(--red)}
 
 /* Hero */
-.lp-hero{position:relative;display:flex;align-items:center;padding:120px 24px 80px;overflow:visible}
+.lp-hero{position:relative;display:flex;align-items:center;padding:clamp(100px,15vh,160px) 24px clamp(80px,12vh,140px);overflow:visible}
 .lp-hero-inner{width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;position:relative;z-index:2}
 .lp-hero-bg{position:absolute;inset:0;overflow:hidden}
 .lp-gradient-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3}
@@ -602,7 +602,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 /* Desktop (769px+) */
 @media(min-width:769px){
-  .lp-hero{min-height:100svh}
   .lp-hero-inner{flex-direction:row;gap:60px;align-items:center}
   .lp-hero-visual{margin-top:0;flex:1}
   .lp-install-btn{display:none !important}
