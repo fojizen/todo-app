@@ -908,6 +908,28 @@
     var mDrawerLogout = document.getElementById('mobileDrawerLogout');
     if (mDrawerLogout) mDrawerLogout.addEventListener('click', function () { handleLpLogout(); });
 
+    var mDrawerLogin = document.getElementById('mobileDrawerLogin');
+    var mDrawerRegister = document.getElementById('mobileDrawerRegister');
+    if (mDrawerLogin) mDrawerLogin.addEventListener('click', function () {
+      mDrawerLogin.classList.add('active');
+      if (mDrawerRegister) mDrawerRegister.classList.remove('active');
+      var drawer = document.getElementById('mobileDrawer');
+      var overlay = document.getElementById('mobileDrawerOverlay');
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+      navigateTo('loginPage');
+    });
+    if (mDrawerRegister) mDrawerRegister.addEventListener('click', function () {
+      mDrawerRegister.classList.add('active');
+      if (mDrawerLogin) mDrawerLogin.classList.remove('active');
+      var drawer = document.getElementById('mobileDrawer');
+      var overlay = document.getElementById('mobileDrawerOverlay');
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+      navigateTo('loginPage');
+      setTimeout(function () { var rt = document.querySelector('.auth-tab[data-tab="register"]'); if (rt) rt.click(); }, 300);
+    });
+
     /* Scroll reveal */
     var revealEls = document.querySelectorAll('.scroll-reveal');
     if ('IntersectionObserver' in window) {
