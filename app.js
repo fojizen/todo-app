@@ -413,10 +413,10 @@
   /* ── Page Navigation ── */
 
   function resetHamburgerNav() {
-    var links = document.querySelector('.lp-nav-links');
-    var actions = document.querySelector('.lp-nav-actions');
-    if (links) { links.removeAttribute('style'); }
-    if (actions) { actions.removeAttribute('style'); }
+    var drawer = document.getElementById('mobileDrawer');
+    var overlay = document.getElementById('mobileDrawerOverlay');
+    if (drawer) drawer.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
   }
 
   function showLoader() {
@@ -830,38 +830,42 @@
       }
       var hamburger = e.target.closest('.lp-hamburger');
       if (hamburger) {
-        var links = document.querySelector('.lp-nav-links');
-        var actions = document.querySelector('.lp-nav-actions');
-        if (links) {
-          var vis = links.style.display === 'flex';
-          links.style.display = vis ? 'none' : 'flex';
-          if (actions) actions.style.display = vis ? 'none' : 'flex';
-          if (!vis) {
-            links.style.display = 'flex';
-            Object.assign(links.style, {
-              flexDirection: 'column', position: 'absolute', top: '56px', left: '0', right: '0',
-              background: 'var(--card)', padding: '16px 24px', backdropFilter: 'blur(24px)',
-              borderBottom: '1px solid var(--border)', zIndex: '1000', gap: '16px'
-            });
-            if (actions) {
-              actions.style.display = 'flex';
-              var topOffset = links.offsetHeight + 56;
-              Object.assign(actions.style, {
-                flexDirection: 'column', position: 'absolute', top: topOffset + 'px', left: '0', right: '0',
-                background: 'var(--card)', padding: '16px 24px', backdropFilter: 'blur(24px)',
-                borderBottom: '1px solid var(--border)', zIndex: '1000', gap: '12px'
-              });
-            }
-          }
+        var drawer = document.getElementById('mobileDrawer');
+        var overlay = document.getElementById('mobileDrawerOverlay');
+        if (drawer) {
+          var isOpen = drawer.classList.contains('open');
+          drawer.classList.toggle('open');
+          if (overlay) overlay.classList.toggle('open');
         }
         return;
       }
-      if (!e.target.closest('.lp-hamburger, .lp-nav-links, .lp-nav-actions')) {
-        var nl = document.querySelector('.lp-nav-links');
-        var na = document.querySelector('.lp-nav-actions');
-        if (nl && nl.style.display === 'flex') { nl.style.display = 'none'; if (na) na.style.display = 'none'; }
+      if (!e.target.closest('.lp-hamburger, .mobile-drawer, .mobile-drawer *')) {
+        var drawer = document.getElementById('mobileDrawer');
+        if (drawer && drawer.classList.contains('open')) drawer.classList.remove('open');
       }
     });
+
+    var drawerOverlay = document.getElementById('mobileDrawerOverlay');
+    if (drawerOverlay) drawerOverlay.addEventListener('click', function () {
+      var drawer = document.getElementById('mobileDrawer');
+      if (drawer) drawer.classList.remove('open');
+    });
+
+    var drawer = document.getElementById('mobileDrawer');
+    if (drawer) drawer.addEventListener('click', function (e) {
+      if (e.target.classList.contains('mobile-drawer-link')) {
+        var drawerEl = document.getElementById('mobileDrawer');
+        var overlayEl = document.getElementById('mobileDrawerOverlay');
+        if (drawerEl) drawerEl.classList.remove('open');
+        if (overlayEl) overlayEl.classList.remove('open');
+      }
+    });
+
+    var mDrawerTasks = document.getElementById('mobileDrawerTasks');
+    if (mDrawerTasks) mDrawerTasks.addEventListener('click', function () { navigateTo('mainPage'); });
+
+    var mDrawerLogout = document.getElementById('mobileDrawerLogout');
+    if (mDrawerLogout) mDrawerLogout.addEventListener('click', function () { handleLpLogout(); });
 
     /* Scroll reveal */
     var revealEls = document.querySelectorAll('.scroll-reveal');
