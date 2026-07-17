@@ -248,6 +248,11 @@
     </section>
 
     <section class="lp-section lp-features" id="features">
+      <div class="lp-section-deco">
+        <div class="lp-float-code lp-fc-1"><span class="lp-kw">const</span> tasks = <span class="lp-fn">await</span> db.<span class="lp-fn">query</span>(<span class="lp-str">'SELECT *'</span>);</div>
+        <div class="lp-float-code lp-fc-2"><span class="lp-kw">if</span> (task.done) { <span class="lp-fn">updateStats</span>(); }</div>
+        <div class="lp-float-code lp-fc-3"><span class="lp-kw">return</span> { priority: <span class="lp-str">'high'</span>, status: <span class="lp-str">'active'</span> };</div>
+      </div>
       <div class="lp-container">
         <div class="lp-section-header scroll-reveal">
           <span class="lp-section-tag" data-lang-key="feat.tag">Ozellikler</span>
@@ -285,6 +290,10 @@
     </section>
 
     <section class="lp-section lp-how" id="how">
+      <div class="lp-section-deco">
+        <div class="lp-float-code lp-fc-4"><span class="lp-kw">async function</span> <span class="lp-fn">register</span>(user) { ... }</div>
+        <div class="lp-float-code lp-fc-5"><span class="lp-kw">app</span>.<span class="lp-fn">post</span>(<span class="lp-str">'/api/login'</span>, handler);</div>
+      </div>
       <div class="lp-container">
         <div class="lp-section-header scroll-reveal">
           <span class="lp-section-tag" data-lang-key="how.tag">Nasil Calisir</span>
@@ -319,6 +328,10 @@
     </section>
 
     <section class="lp-section lp-tech" id="tech">
+      <div class="lp-section-deco">
+        <div class="lp-float-code lp-fc-6"><span class="lp-kw">npm</span> install express pg bcryptjs jsonwebtoken</div>
+        <div class="lp-float-code lp-fc-7"><span class="lp-kw">import</span> { Pool } <span class="lp-kw">from</span> <span class="lp-str">'pg'</span>;</div>
+      </div>
       <div class="lp-container">
         <div class="lp-section-header scroll-reveal">
           <span class="lp-section-tag" data-lang-key="tech.tag">Teknoloji</span>
