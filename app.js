@@ -498,9 +498,13 @@
     var ctaSub = document.getElementById('ctaSub');
     var ctaBtnText = document.getElementById('ctaBtnText');
     var heroCtaText = document.getElementById('heroCtaText');
+    var drawerAuth = document.querySelector('.mobile-drawer-auth');
+    var drawerUser = document.getElementById('mobileDrawerUser');
     if (currentUser) {
       if (authBtns) authBtns.style.display = 'none';
       if (userMenu) { userMenu.style.display = ''; if (usernameEl) usernameEl.textContent = currentUser; }
+      if (drawerAuth) drawerAuth.style.display = 'none';
+      if (drawerUser) drawerUser.style.display = '';
       if (ctaTitle) ctaTitle.innerHTML = t('cta.title loggedIn');
       if (ctaSub) ctaSub.textContent = t('cta.sub loggedIn');
       if (ctaBtnText) { ctaBtnText.textContent = t('cta.btn loggedIn'); ctaBtnText.removeAttribute('data-lang-key'); }
@@ -508,6 +512,8 @@
     } else {
       if (authBtns) authBtns.style.display = '';
       if (userMenu) userMenu.style.display = 'none';
+      if (drawerAuth) drawerAuth.style.display = '';
+      if (drawerUser) drawerUser.style.display = 'none';
       if (ctaTitle) { ctaTitle.innerHTML = t('cta.title'); ctaTitle.setAttribute('data-lang-key', 'cta.title'); }
       if (ctaSub) { ctaSub.textContent = t('cta.sub'); ctaSub.setAttribute('data-lang-key', 'cta.sub'); }
       if (ctaBtnText) { ctaBtnText.textContent = t('cta.btn'); ctaBtnText.setAttribute('data-lang-key', 'cta.btn'); }
