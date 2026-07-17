@@ -437,14 +437,15 @@
     }
   }
 
-  function navigateTo(name) {
+  function navigateTo(name, cb) {
     var current = document.querySelector('.page.active');
     var next = document.getElementById(name);
-    if (current === next) return;
+    if (current === next) { if (cb) cb(); return; }
     showLoader();
     var startTime = Date.now();
     requestAnimationFrame(function () {
       showPage(name, true);
+      if (cb) cb();
       var elapsed = Date.now() - startTime;
       var remaining = Math.max(0, 350 - elapsed);
       setTimeout(function () { hideLoader(); }, remaining);
@@ -929,8 +930,10 @@
       var overlay = document.getElementById('mobileDrawerOverlay');
       if (drawer) drawer.classList.remove('open');
       if (overlay) overlay.classList.remove('open');
-      navigateTo('loginPage');
-      setTimeout(function () { var rt = document.getElementById('registerTab'); if (rt) rt.click(); }, 400);
+      navigateTo('loginPage', function () {
+        var rt = document.getElementById('registerTab');
+        if (rt) rt.click();
+      });
     });
 
     /* Scroll reveal */
