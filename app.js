@@ -841,14 +841,20 @@
       }
       if (!e.target.closest('.lp-hamburger, .mobile-drawer, .mobile-drawer *')) {
         var drawer = document.getElementById('mobileDrawer');
-        if (drawer && drawer.classList.contains('open')) drawer.classList.remove('open');
+        var overlay = document.getElementById('mobileDrawerOverlay');
+        if (drawer && drawer.classList.contains('open')) {
+          drawer.classList.remove('open');
+          if (overlay) overlay.classList.remove('open');
+        }
       }
     });
 
     var drawerOverlay = document.getElementById('mobileDrawerOverlay');
     if (drawerOverlay) drawerOverlay.addEventListener('click', function () {
       var drawer = document.getElementById('mobileDrawer');
+      var overlay = document.getElementById('mobileDrawerOverlay');
       if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
     });
 
     var drawer = document.getElementById('mobileDrawer');
@@ -860,6 +866,41 @@
         if (overlayEl) overlayEl.classList.remove('open');
       }
     });
+
+    var drawerSwipeEl = document.getElementById('mobileDrawer');
+    if (drawerSwipeEl) {
+      var swipeStartX = 0, swipeStartY = 0, swipeActive = false;
+      drawerSwipeEl.addEventListener('touchstart', function (e) {
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+        swipeActive = true;
+      }, { passive: true });
+      drawerSwipeEl.addEventListener('touchmove', function (e) {
+        if (!swipeActive) return;
+        var dx = e.touches[0].clientX - swipeStartX;
+        var dy = Math.abs(e.touches[0].clientY - swipeStartY);
+        if (dy > 40) { swipeActive = false; return; }
+        if (dx > 0) {
+          drawerSwipeEl.style.transition = 'none';
+          drawerSwipeEl.style.transform = 'translateX(' + Math.min(dx, 280) + 'px)';
+          var ov = document.getElementById('mobileDrawerOverlay');
+          if (ov) ov.style.opacity = Math.max(0, 1 - dx / 280);
+        }
+      }, { passive: true });
+      drawerSwipeEl.addEventListener('touchend', function (e) {
+        if (!swipeActive) return;
+        swipeActive = false;
+        var dx = (e.changedTouches[0].clientX) - swipeStartX;
+        drawerSwipeEl.style.transition = '';
+        drawerSwipeEl.style.transform = '';
+        var ov = document.getElementById('mobileDrawerOverlay');
+        if (ov) ov.style.opacity = '';
+        if (dx > 100) {
+          drawerSwipeEl.classList.remove('open');
+          if (ov) ov.classList.remove('open');
+        }
+      }, { passive: true });
+    }
 
     var mDrawerTasks = document.getElementById('mobileDrawerTasks');
     if (mDrawerTasks) mDrawerTasks.addEventListener('click', function () { navigateTo('mainPage'); });
@@ -1438,7 +1479,9 @@ window.addEventListener('beforeinstallprompt', function (e) {
   e.preventDefault();
   deferredPrompt = e;
   var installBtn = document.getElementById('lpInstallBtn');
-  if (installBtn) installBtn.style.display = '';
+  if (installBtn) {
+    installBtn.classList.remove('pwa-installed');
+  }
 });
 
 var installBtn = document.getElementById('lpInstallBtn');
@@ -1451,5 +1494,5 @@ if (installBtn) installBtn.addEventListener('click', function () {
 window.addEventListener('appinstalled', function () {
   deferredPrompt = null;
   var installBtn = document.getElementById('lpInstallBtn');
-  if (installBtn) installBtn.style.display = 'none';
+  if (installBtn) installBtn.classList.add('pwa-installed');
 });
