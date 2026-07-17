@@ -30,7 +30,7 @@
 - Create, edit, and delete tasks
 - Toggle task completion (checkbox)
 - Priority levels: Low, Medium, High
-- Due dates with overdue highlighting (red)
+- Due dates with overdue highlighting
 - Categories: Work, Personal, Shopping, Health, Education
 - Tag system (comma-separated)
 - Drag & drop reordering
@@ -59,6 +59,12 @@
 - Enhanced options panel (modern select, date picker, tag input)
 - Footer social media links (GitHub, LinkedIn, Instagram, Portfolio)
 
+### PWA (Progressive Web App)
+- Installable on mobile (Android, iOS) and desktop
+- Service worker with network-first and cache-first strategies
+- Offline support for static assets
+- App-like experience when installed
+
 ### Security
 - Rate limiting (login: 15/min, register: 10/15min, task CRUD: 30/min)
 - Brute force protection (5 failed attempts → 15 min lockout)
@@ -86,7 +92,8 @@
 | Styling | Custom CSS (CSS Variables, Glassmorphism, Animations) |
 | Animations | Canvas API (particles), CSS Animations |
 | Email | Resend API (HTTPS, email verification) |
-| Deployment | OnRender (backend) + GitHub Pages |
+| PWA | Service Worker, Web App Manifest |
+| Deployment | OnRender (backend) |
 
 ---
 
@@ -127,16 +134,16 @@ todo-app/
 ├── app.js               # Frontend JavaScript (IIFE, API, UI)
 ├── index.html           # Main HTML page (landing, login, tasks, modals)
 ├── styles.css           # CSS styles (theme, responsive, animations)
+├── sw.js                # Service worker (PWA)
+├── manifest.json        # Web App Manifest (PWA)
+├── icon-192.png         # PWA icon 192x192
+├── icon-512.png         # PWA icon 512x512
 ├── package.json         # Dependencies and scripts
 ├── favicon.svg          # SVG favicon (checkmark icon)
 ├── favicon.ico          # ICO favicon (search engines)
 ├── apple-touch-icon.png # Apple touch icon (mobile)
 ├── sitemap.xml          # Sitemap (search engines)
-└── screenshots/         # Screenshots (for GitHub)
-    ├── homepage.png
-    ├── features.png
-    ├── login.png
-    └── MyTasks.png
+└── .env.example         # Environment variables template
 ```
 
 ---

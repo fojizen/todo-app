@@ -18,6 +18,8 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+server.log
+server_err.log
 
 # Screenshots (personal, not for repo)
 screenshots/

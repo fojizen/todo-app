@@ -1,2 +1,0 @@
-Server running: http://localhost:3000
-INFO: JWT_SECRET dosyadan yüklendi. Üretimde JWT_SECRET ortam değişkeni ayarlayın.
