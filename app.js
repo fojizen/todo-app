@@ -31,6 +31,7 @@
     tr: {
       'nav.features':'Ozellikler','nav.how':'Nasil Calisir','nav.tech':'Teknoloji',
       'nav.login':'Giris Yap','nav.register':'Kayit Ol','nav.home':'Anasayfa','nav.gotasks':'Gorevlerim',
+      'nav.about':'Hakkinda','nav.privacy':'Gizlilik',
       'hero.badge':'Gorevlerini Duzene Koyma Zamani',
       'hero.title':'Yapman gereken her sey,<br><span class="lp-gradient-text">tek bir yerde.</span>',
       'hero.sub':'Gorevlerini olustur, onceliklendir, kategorilere ayir ve tamamla.<br>Guvenli, hizli ve muhtesem gorunen bir todo deneyimi.',
@@ -63,6 +64,8 @@
       'footer.copyright':'&copy; 2026 fojizen. Tum haklari saklidir.',
       'about.tag':'Gelistirici','about.title':'fojizen<br><span class="lp-gradient-text">Hakkinda.</span>',
       'about.desc':'JavaScript, Node.js ve PostgreSQL ile modern, guvenli ve performansli web uygulamalari gelistiriyorum. Vanilla JS ile framework bagimliligi olmadan, saf performans ve temiz kod odakli projeler uretiyorum.',
+      'privacy.tag':'Yasal','privacy.title':'Gizlilik<br><span class="lp-gradient-text">Politikasi.</span>',
+      'privacy.content':'<p>Son guncelleme: 17 Temmuz 2026</p><p><strong>1. Toplanan Veriler</strong></p><p>Kayit isleminde kullanici adi, e-posta adresi ve sifreniz (bcrypt ile sifrelenmis olarak) toplanir. Gorevleriniz uygulama icerisinde saklanir.</p><p><strong>2. Veri Kullanimi</strong></p><p>Toplanan veriler yalnizca uygulamanin dogru calismasi, hesap guvenligi ve size daha iyi bir deneyim sunmak icin kullanilir. Ucuncu taraflarla paylasilmaz.</p><p><strong>3. Veri Guvenligi</strong></p><p>Sifreler bcrypt ile hashlenir, JWT token ile oturumlar guvence altina alinir. Verileriniz SSL/TLS ile sifreli olarak iletilir. HTTPS uzerinden baglanti kurulur.</p><p><strong>4. Cookie Kullanimi</strong></p><p>Oturum yonetimi icin httpOnly cookie kullanilir. Reklam veya analitik cookie kullanilmaz.</p><p><strong>5. Veri Saklama</strong></p><p>Hesabinizi sildiginizde tum verileriniz kalici olarak silinir. Pasif hesaplar herhangi bir sure sonunda otomatik silinmez.</p><p><strong>6. Iletisim</strong></p><p>Gizlilik politikasiyla ilgili sorulariniz icin <a href="https://github.com/fojizen" target="_blank" rel="noopener">GitHub</a> uzerinden ulasin.</p>',
       'verify.title':'E-postani Dogrula','verify.desc':'Hesabini aktif etmek icin e-posta kutunu kontrol et. Dogrulama linkine tikla.',
       'verify.close':'Tamam','verify.resend':'Tekrar Gonder',
       'toast.verificationSent':'Dogrulama epostasi gonderildi',
@@ -119,6 +122,7 @@
     en: {
       'nav.features':'Features','nav.how':'How It Works','nav.tech':'Tech',
       'nav.login':'Login','nav.register':'Register','nav.home':'Home','nav.gotasks':'My Tasks',
+      'nav.about':'About','nav.privacy':'Privacy',
       'hero.badge':'Time to Organize Your Tasks',
       'hero.title':'Everything you need,<br><span class="lp-gradient-text">in one place.</span>',
       'hero.sub':'Create, prioritize, categorize and complete tasks.<br>A secure, fast and beautiful todo experience.',
@@ -151,6 +155,8 @@
       'footer.copyright':'&copy; 2026 fojizen. All rights reserved.',
       'about.tag':'Developer','about.title':'About<br><span class="lp-gradient-text">fojizen.</span>',
       'about.desc':'I build modern, secure and performant web applications with JavaScript, Node.js and PostgreSQL. Focused on clean code and raw performance with vanilla JS, no framework dependencies.',
+      'privacy.tag':'Legal','privacy.title':'Privacy<br><span class="lp-gradient-text">Policy.</span>',
+      'privacy.content':'<p>Last updated: July 17, 2026</p><p><strong>1. Data Collected</strong></p><p>During registration, your username, email address, and password (encrypted with bcrypt) are collected. Your tasks are stored within the application.</p><p><strong>2. Data Usage</strong></p><p>Collected data is used solely for the proper functioning of the application, account security, and providing you with a better experience. It is not shared with third parties.</p><p><strong>3. Data Security</strong></p><p>Passwords are hashed with bcrypt, sessions are secured with JWT tokens. Your data is transmitted encrypted via SSL/TLS. Connections are established over HTTPS.</p><p><strong>4. Cookie Usage</strong></p><p>httpOnly cookies are used for session management. No advertising or analytics cookies are used.</p><p><strong>5. Data Retention</strong></p><p>When you delete your account, all your data is permanently deleted. Inactive accounts are not automatically deleted after any period.</p><p><strong>6. Contact</strong></p><p>For questions about the privacy policy, reach out via <a href="https://github.com/fojizen" target="_blank" rel="noopener">GitHub</a>.</p>',
       'verify.title':'Verify Your Email','verify.desc':'Check your inbox and click the verification link to activate your account.',
       'verify.close':'OK','verify.resend':'Resend',
       'toast.verificationSent':'Verification email sent',
@@ -218,7 +224,7 @@
     'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}]
   };
 
-  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'about.title':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
+  var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'about.title':1,'privacy.title':1,'privacy.content':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
 
   function t(key) {
     return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.tr && i18n.tr[key]) || key;
