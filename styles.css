@@ -274,9 +274,10 @@ html.loading .page{display:none!important}
 .lp-tech-item span{font-size:.8125rem;color:var(--text2)}
 
 /* CTA */
-.lp-cta-section{padding:80px 0 100px}
-.lp-cta-box{position:relative;text-align:center;padding:60px 40px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
-.lp-cta-glow{position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:400px;height:400px;background:var(--accent);filter:blur(120px);opacity:.1}
+.lp-cta-section{padding:80px 0 100px;position:relative}
+.lp-cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:var(--accent);filter:blur(160px);opacity:.08;border-radius:50%;pointer-events:none}
+.lp-cta-box{position:relative;text-align:center;padding:60px 40px;background:transparent;border:none;border-radius:var(--r2);overflow:visible}
+.lp-cta-glow{display:none}
 .lp-cta-box h2{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;margin-bottom:12px;position:relative}
 .lp-cta-box p{color:var(--text2);margin-bottom:28px;font-size:1.05rem;position:relative}
 .lp-cta-box .btn{position:relative}
