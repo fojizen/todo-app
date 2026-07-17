@@ -930,7 +930,7 @@
       if (drawer) drawer.classList.remove('open');
       if (overlay) overlay.classList.remove('open');
       navigateTo('loginPage');
-      setTimeout(function () { var rt = document.querySelector('.auth-tab[data-tab="register"]'); if (rt) rt.click(); }, 300);
+      setTimeout(function () { var rt = document.getElementById('registerTab'); if (rt) rt.click(); }, 400);
     });
 
     /* Scroll reveal */
