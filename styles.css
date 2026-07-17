@@ -61,7 +61,7 @@ input,select,textarea,button{font-family:inherit}
 html.loading .page{display:none!important}
 .page{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:none;flex-direction:column}
 .page.active{display:flex}
-.page-transition-out{opacity:0;transform:translateY(-12px);transition:opacity .3s ease,transform .3s ease}
+.page-transition-out{opacity:0;transform:translateY(-12px);transition:opacity .15s ease,transform .15s ease}
 
 /* ── Toast ── */
 .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;padding-top:var(--safe-top)}
@@ -679,7 +679,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 }
 
 /* ── Loader ── */
-.loader-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .6s cubic-bezier(.4,0,.2,1),visibility .6s}
+.loader-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .25s cubic-bezier(.4,0,.2,1),visibility .25s}
 .loader-screen.fade-out{opacity:0;visibility:hidden}
 .loader-content{display:flex;flex-direction:column;align-items:center;gap:28px}
 .loader-ring{position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center}

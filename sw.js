@@ -1,4 +1,4 @@
-var CACHE_NAME = 'todoapp-v4';
+var CACHE_NAME = 'todoapp-v5';
 var STATIC_ASSETS = [
   '/',
   '/index.html',

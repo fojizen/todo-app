@@ -507,12 +507,12 @@
       setTimeout(function () {
         document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
         next.classList.add('active');
-        setTimeout(function () { transitioning = false; }, 50);
-        if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 50); }
+        setTimeout(function () { transitioning = false; }, 30);
+        if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 30); }
         if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
         else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
         window.scrollTo(0, 0);
-      }, 350);
+      }, 180);
     } else {
       transitioning = false;
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
@@ -681,7 +681,7 @@
   if (authBackBtn) authBackBtn.addEventListener('click', function (e) {
     e.preventDefault();
     navigateTo('landingPage');
-    setTimeout(initLanding, 450);
+    setTimeout(initLanding, 200);
   });
 
   /* Login/Register tabs */
@@ -814,7 +814,7 @@
   if (homeBtnEl) homeBtnEl.addEventListener('click', function () {
     updateLandingNav();
     navigateTo('landingPage');
-    setTimeout(initLanding, 450);
+    setTimeout(initLanding, 200);
   });
 
   /* Logout */
@@ -829,7 +829,7 @@
     if (drawer) drawer.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
     navigateTo('landingPage');
-    setTimeout(initLanding, 450);
+    setTimeout(initLanding, 200);
     showToast(t('toast.logout'), 'info');
   }
 
