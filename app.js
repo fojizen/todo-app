@@ -1233,99 +1233,45 @@
     };
 
     /* Desktop drag */
+    var draggedId = null;
     list.ondragstart = function (e) {
       var item = e.target.closest('.task-item');
-      if (!item) return;
+      if (!item || item.classList.contains('completed')) return;
+      draggedId = item.dataset.id;
       item.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', item.dataset.id);
+      e.dataTransfer.setData('text/plain', draggedId);
     };
     list.ondragend = function (e) {
-      var item = e.target.closest('.task-item');
-      if (item) item.classList.remove('dragging');
-      list.querySelectorAll('.task-item').forEach(function (el) { el.classList.remove('drag-over'); });
+      draggedId = null;
+      list.querySelectorAll('.task-item').forEach(function (el) { el.classList.remove('dragging', 'drag-over'); });
     };
     list.ondragover = function (e) {
-      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       var item = e.target.closest('.task-item');
       list.querySelectorAll('.task-item').forEach(function (el) { el.classList.remove('drag-over'); });
-      if (item) item.classList.add('drag-over');
+      if (item && item.dataset.id !== draggedId) item.classList.add('drag-over');
     };
     list.ondrop = function (e) {
       e.preventDefault();
+      e.stopPropagation();
       var targetItem = e.target.closest('.task-item');
       if (!targetItem) return;
-      var draggedId = e.dataTransfer.getData('text/plain');
-      var targetId = targetItem.dataset.id;
-      if (!draggedId || draggedId === targetId) return;
-      var fromIdx = todos.findIndex(function (x) { return String(x.id) === String(draggedId); });
-      var toIdx = todos.findIndex(function (x) { return String(x.id) === String(targetId); });
+      var dropId = targetItem.dataset.id;
+      if (!draggedId || draggedId === dropId) return;
+      var fromIdx = todos.findIndex(function (x) { return String(x.id) === draggedId; });
+      var toIdx = todos.findIndex(function (x) { return String(x.id) === dropId; });
       if (fromIdx === -1 || toIdx === -1) return;
       var moved = todos.splice(fromIdx, 1)[0];
       todos.splice(toIdx, 0, moved);
+      draggedId = null;
+      render();
       api('PUT', '/tasks/reorder', { orderedIds: todos.map(function (x) { return x.id; }) })
-        .then(function () { render(); })
-        .catch(function () { showToast(t('toast.error'), 'error'); loadTasks().then(render); });
+        .catch(function () { loadTasks().then(render); });
     };
 
-    /* Mobile touch drag */
-    var touchDragItem = null, touchClone = null, touchStartX = 0, touchStartY = 0, touchMoved = false;
 
-    list.ontouchstart = function (e) {
-      var item = e.target.closest('.task-item');
-      if (!item || e.target.closest('.act-btn') || e.target.closest('.task-check')) return;
-      var touch = e.touches[0];
-      touchStartX = touch.clientX; touchStartY = touch.clientY; touchMoved = false;
-      touchDragItem = item;
-      touchDragItem._timer = setTimeout(function () {
-        touchMoved = true;
-        touchDragItem.classList.add('dragging');
-        touchClone = touchDragItem.cloneNode(true);
-        touchClone.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;opacity:.8;width:' + touchDragItem.offsetWidth + 'px;transform:scale(1.02);box-shadow:0 8px 32px rgba(0,0,0,.4);';
-        touchClone.style.left = (touch.clientX - touchDragItem.offsetWidth / 2) + 'px';
-        touchClone.style.top = (touch.clientY - 20) + 'px';
-        document.body.appendChild(touchClone);
-      }, 300);
-    };
-    list.ontouchmove = function (e) {
-      if (!touchDragItem) return;
-      var touch = e.touches[0];
-      var dx = Math.abs(touch.clientX - touchStartX), dy = Math.abs(touch.clientY - touchStartY);
-      if (dx > 10 || dy > 10) { touchMoved = true; if (touchDragItem._timer) clearTimeout(touchDragItem._timer); }
-      if (touchClone) {
-        e.preventDefault();
-        touchClone.style.left = (touch.clientX - touchDragItem.offsetWidth / 2) + 'px';
-        touchClone.style.top = (touch.clientY - 20) + 'px';
-        var under = document.elementFromPoint(touch.clientX, touch.clientY);
-        var underItem = under ? under.closest('.task-item') : null;
-        list.querySelectorAll('.task-item').forEach(function (el) { el.classList.remove('drag-over'); });
-        if (underItem && underItem !== touchDragItem) underItem.classList.add('drag-over');
-      }
-    };
-    list.ontouchend = function (e) {
-      if (!touchDragItem) return;
-      if (touchDragItem._timer) clearTimeout(touchDragItem._timer);
-      if (touchClone) {
-        var touch = e.changedTouches[0];
-        var under = document.elementFromPoint(touch.clientX, touch.clientY);
-        var underItem = under ? under.closest('.task-item') : null;
-        if (underItem && underItem !== touchDragItem) {
-          var fromIdx = todos.findIndex(function (x) { return String(x.id) === touchDragItem.dataset.id; });
-          var toIdx = todos.findIndex(function (x) { return String(x.id) === underItem.dataset.id; });
-          if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
-            var moved = todos.splice(fromIdx, 1)[0];
-            todos.splice(toIdx, 0, moved);
-            api('PUT', '/tasks/reorder', { orderedIds: todos.map(function (x) { return x.id; }) })
-              .then(function () { render(); })
-              .catch(function () { showToast(t('toast.error'), 'error'); loadTasks().then(render); });
-          }
-        }
-        touchClone.remove(); touchClone = null;
-      }
-      touchDragItem.classList.remove('dragging');
-      list.querySelectorAll('.task-item').forEach(function (el) { el.classList.remove('drag-over'); });
-      touchDragItem = null; touchMoved = false;
-    };
   }
 
   /* ── Task Form ── */
