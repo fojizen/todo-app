@@ -269,9 +269,9 @@
     'filter.status':[{value:'all',tr:'Tumu',en:'All'},{value:'active',tr:'Aktif',en:'Active'},{value:'completed',tr:'Tamamlanan',en:'Completed'}],
     'filter.priority':[{value:'all',tr:'Tum Oncelikler',en:'All Priorities'},{value:'high',tr:'Yuksek',en:'High'},{value:'medium',tr:'Orta',en:'Medium'},{value:'low',tr:'Dusuk',en:'Low'}],
     'task.priority':[{value:'low',tr:'Dusuk',en:'Low'},{value:'medium',tr:'Orta',en:'Medium'},{value:'high',tr:'Yuksek',en:'High'}],
-    'task.category':[{value:'',tr:'Yok',en:'None'},{value:'Is',tr:'Is',en:'Work'},{value:'Kisisel',tr:'Kisisel',en:'Personal'},{value:'Alisveris',tr:'Alisveris',en:'Shopping'},{value:'Saglik',tr:'Saglik',en:'Health'},{value:'Egitim',tr:'Egitim',en:'Education'}],
+    'task.category':[],
     'edit.priority':[{value:'low',tr:'Dusuk',en:'Low'},{value:'medium',tr:'Orta',en:'Medium'},{value:'high',tr:'Yuksek',en:'High'}],
-    'edit.category':[{value:'',tr:'Yok',en:'None'},{value:'Is',tr:'Is',en:'Work'},{value:'Kisisel',tr:'Kisisel',en:'Personal'},{value:'Alisveris',tr:'Alisveris',en:'Shopping'},{value:'Saglik',tr:'Saglik',en:'Health'},{value:'Egitim',tr:'Egitim',en:'Education'}],
+    'edit.category':[],
     'sort.select':[{value:'order-asc',tr:'Siralama',en:'Sort'},{value:'createdAt-desc',tr:'En Yeni',en:'Newest'},{value:'createdAt-asc',tr:'En Eski',en:'Oldest'},{value:'priority-desc',tr:'Oncelik',en:'Priority'},{value:'dueDate-asc',tr:'Bitis Tarihi',en:'Due Date'}],
     'adminEdit.role':[{value:'user',tr:'User',en:'User'},{value:'admin',tr:'Admin',en:'Admin'}],
     'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}],
@@ -325,6 +325,7 @@
     if (todos.length) {
       render();
     }
+    renderCategorySelects();
     var uw = document.getElementById('userWelcome');
     if (uw && currentUser) uw.textContent = t('welcome.prefix') + ' ' + currentUser + '!';
   }
@@ -1409,6 +1410,7 @@
     if (!sel) return;
     var cur = sel.value;
     var cats = [];
+    categories.forEach(function (c) { if (cats.indexOf(c.name) === -1) cats.push(c.name); });
     todos.forEach(function (x) { if (x.category && cats.indexOf(x.category) === -1) cats.push(x.category); });
     cats.sort();
     sel.innerHTML = '<option value="all">' + t('filter.allCat') + '</option>' +
@@ -1498,7 +1500,18 @@
   }
 
   function loadCategories() {
-    return api('GET', '/categories').then(function(data) { categories = data || []; renderSidebarCategories(); }).catch(function() { categories = []; });
+    return api('GET', '/categories').then(function(data) { categories = data || []; renderSidebarCategories(); renderCategorySelects(); }).catch(function() { categories = []; });
+  }
+
+  function renderCategorySelects() {
+    var taskSel = document.getElementById('taskCategory');
+    var editSel = document.getElementById('editCategory');
+    var noneTr = currentLang === 'tr' ? 'Yok' : 'None';
+    var opts = '<option value="">' + noneTr + '</option>' + categories.map(function(c) {
+      return '<option value="' + esc(c.name) + '">' + esc(c.name) + '</option>';
+    }).join('');
+    if (taskSel) taskSel.innerHTML = opts;
+    if (editSel) editSel.innerHTML = opts;
   }
 
   /* ── Gamification ── */
