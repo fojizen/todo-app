@@ -740,8 +740,11 @@
   if (registerTab) registerTab.addEventListener('click', function () { switchTab('register'); });
 
   /* Google Sign-In */
+  var googleInited = false;
   function initGoogleSignIn() {
+    if (googleInited) return;
     if (typeof google === 'undefined' || !google.accounts || !GOOGLE_CLIENT_ID) return;
+    googleInited = true;
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: function (response) {
@@ -760,21 +763,23 @@
         });
       }
     });
-    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), {
-      theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
-      size: 'large',
-      width: 320,
-      text: 'continue_with',
-      shape: 'rectangular'
-    });
+    var btnEl = document.getElementById('googleSignInBtn');
+    if (btnEl) {
+      google.accounts.id.renderButton(btnEl, {
+        theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
+        size: 'large',
+        width: 320,
+        text: 'continue_with',
+        shape: 'rectangular'
+      });
+    }
   }
-  if (typeof google !== 'undefined' && google.accounts) {
-    initGoogleSignIn();
-  } else {
-    window.addEventListener('load', function () {
-      setTimeout(initGoogleSignIn, 500);
-    });
+  function tryInitGoogle(retries) {
+    if (googleInited) return;
+    if (typeof google !== 'undefined' && google.accounts) { initGoogleSignIn(); return; }
+    if (retries > 0) setTimeout(function () { tryInitGoogle(retries - 1); }, 300);
   }
+  window.addEventListener('load', function () { tryInitGoogle(10); });
 
   /* Password toggle */
   document.querySelectorAll('.toggle-pw').forEach(function (btn) {
