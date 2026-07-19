@@ -391,6 +391,26 @@ app.post('/api/tasks', auth, async (req, res) => {
   }
 });
 
+app.put('/api/tasks/reorder', auth, async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { orderedIds } = req.body || {};
+    if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds gerekli' });
+    await client.query('BEGIN');
+    for (let i = 0; i < orderedIds.length; i++) {
+      await client.query('UPDATE tasks SET itemorder = $1 WHERE id = $2 AND userid = $3', [i, orderedIds[i], req.user.id]);
+    }
+    await client.query('COMMIT');
+    res.json({ ok: true });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    console.error('Reorder error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  } finally {
+    client.release();
+  }
+});
+
 app.put('/api/tasks/:id', auth, async (req, res) => {
   try {
     if (rateLimit('taskupd:' + req.user.id, 120, 60000)) return res.status(429).json({ error: 'Cok fazla istek' });
@@ -436,26 +456,6 @@ app.delete('/api/tasks/:id', auth, async (req, res) => {
   } catch (e) {
     console.error('Task delete error:', e.stack);
     res.status(500).json({ error: 'Sunucu hatasi' });
-  }
-});
-
-app.put('/api/tasks/reorder', auth, async (req, res) => {
-  const client = await pool.connect();
-  try {
-    const { orderedIds } = req.body || {};
-    if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds gerekli' });
-    await client.query('BEGIN');
-    for (let i = 0; i < orderedIds.length; i++) {
-      await client.query('UPDATE tasks SET itemorder = $1 WHERE id = $2 AND userid = $3', [i, orderedIds[i], req.user.id]);
-    }
-    await client.query('COMMIT');
-    res.json({ ok: true });
-  } catch (e) {
-    await client.query('ROLLBACK');
-    console.error('Reorder error:', e.stack);
-    res.status(500).json({ error: 'Sunucu hatasi' });
-  } finally {
-    client.release();
   }
 });
 
