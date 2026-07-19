@@ -137,7 +137,7 @@
       'sb.focus':'Odaklanma','sb.pomo.ready':'Hazir','sb.pomo.running':'Devam ediyor','sb.pomo.break':'Mola',
       'sb.pomo.start':'Baslat','sb.pomo.pause':'Duraklat','sb.pomo.reset':'Sifirla','sb.pomo.done':'Mola zamanı!',
       'sb.weeklyStats':'Haftalik Istatistik','sb.weeklyMsg':'Bu hafta {n} gorev tamamladin {emoji}',
-      'sb.dailyGoal':'Gunluk Hedef','sb.settings':'Ayarlar',
+      'sb.dailyGoal':'Gunluk Hedef',
       'recurring.none':'Yok','recurring.daily':'Her Gun','recurring.weekly':'Her Hafta','recurring.monthly':'Her Ay',
       'main.task.recurring':'Tekrar','main.task.subtask.ph':'Alt gorev ekle...',
       'edit.recurring':'Tekrar','edit.subtasks':'Alt Gorevler','edit.starred':'Yildizli',
@@ -252,7 +252,7 @@
       'sb.focus':'Focus Timer','sb.pomo.ready':'Ready','sb.pomo.running':'Running','sb.pomo.break':'Break',
       'sb.pomo.start':'Start','sb.pomo.pause':'Pause','sb.pomo.reset':'Reset','sb.pomo.done':'Break time!',
       'sb.weeklyStats':'Weekly Stats','sb.weeklyMsg':'You completed {n} tasks this week {emoji}',
-      'sb.dailyGoal':'Daily Goal','sb.settings':'Settings',
+      'sb.dailyGoal':'Daily Goal',
       'recurring.none':'None','recurring.daily':'Daily','recurring.weekly':'Weekly','recurring.monthly':'Monthly',
       'main.task.recurring':'Repeat','main.task.subtask.ph':'Add subtask...',
       'edit.recurring':'Repeat','edit.subtasks':'Subtasks','edit.starred':'Starred',
@@ -1826,9 +1826,6 @@
       render();
     });
   });
-
-  var sbThemeToggle = document.getElementById('sbThemeToggle');
-  if (sbThemeToggle) sbThemeToggle.addEventListener('click', cycleTheme);
 
   /* ── Add Category ── */
   var sbAddCategoryBtn = document.getElementById('sbAddCategory');
