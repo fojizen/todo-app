@@ -603,9 +603,11 @@
     var welcomeEl = document.getElementById('userWelcome');
     if (welcomeEl) welcomeEl.textContent = t('welcome.prefix') + ' ' + currentUser + '!';
     showAdminBtn();
+    showLoader();
     initSidebar();
     loadTasks().then(function () {
       showPage('mainPage', true);
+      hideLoader();
       render();
       loadCategories();
       loadUserProfile();
