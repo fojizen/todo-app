@@ -1234,6 +1234,7 @@
         var task = todos.find(function (x) { return String(x.id) === stItem.dataset.id; });
         if (!task || !task.subtasks || !task.subtasks[stIdx]) return;
         task.subtasks[stIdx].done = stCb.checked;
+        if (stCb.checked) { awardXP(XP_PER_SUBTASK); }
         render();
         api('PUT', '/tasks/' + task.id, { subtasks: task.subtasks })
           .catch(function () { task.subtasks[stIdx].done = !stCb.checked; render(); showToast(t('toast.error'), 'error'); });
@@ -1496,7 +1497,7 @@
 
   /* ── Gamification ── */
   var XP_PER_TASK = 10;
-  var XP_PER_SUBTASK = 5;
+  var XP_PER_SUBTASK = 20;
   var XP_LEVEL_BASE = 100;
 
   function calcLevel(xp) { return Math.floor(xp / XP_LEVEL_BASE) + 1; }
