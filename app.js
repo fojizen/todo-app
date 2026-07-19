@@ -549,6 +549,7 @@
         next.classList.add('active');
         setTimeout(function () { transitioning = false; }, 30);
         if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 30); }
+        if (name === 'loginPage') { setTimeout(renderGoogleButton, 50); }
         if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
         else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
         window.scrollTo(0, 0);
@@ -558,6 +559,7 @@
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
       next.classList.add('active');
       if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 50); }
+      if (name === 'loginPage') { setTimeout(renderGoogleButton, 50); }
       if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
       else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
       window.scrollTo(0, 0);
@@ -741,10 +743,11 @@
 
   /* Google Sign-In */
   var googleInited = false;
+  var googleReady = false;
   function initGoogleSignIn() {
-    if (googleInited) return;
+    if (googleReady) return;
     if (typeof google === 'undefined' || !google.accounts || !GOOGLE_CLIENT_ID) return;
-    googleInited = true;
+    googleReady = true;
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: function (response) {
@@ -763,20 +766,24 @@
         });
       }
     });
+  }
+  function renderGoogleButton() {
+    if (!googleReady) { initGoogleSignIn(); }
+    if (!googleReady) return;
     var btnEl = document.getElementById('googleSignInBtn');
-    if (btnEl) {
-      google.accounts.id.renderButton(btnEl, {
-        theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
-        size: 'large',
-        width: 320,
-        text: 'continue_with',
-        shape: 'rectangular'
-      });
-    }
+    if (!btnEl) return;
+    btnEl.innerHTML = '';
+    google.accounts.id.renderButton(btnEl, {
+      theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
+      size: 'large',
+      width: 320,
+      text: 'continue_with',
+      shape: 'rectangular'
+    });
   }
   function tryInitGoogle(retries) {
-    if (googleInited) return;
-    if (typeof google !== 'undefined' && google.accounts) { initGoogleSignIn(); return; }
+    if (googleReady) return;
+    if (typeof google !== 'undefined' && google.accounts) { initGoogleSignIn(); renderGoogleButton(); return; }
     if (retries > 0) setTimeout(function () { tryInitGoogle(retries - 1); }, 300);
   }
   window.addEventListener('load', function () { tryInitGoogle(10); });
