@@ -84,6 +84,7 @@
       'toast.verificationSent':'Dogrulama epostasi gonderildi',
       'auth.back':'Anasayfa','auth.subtitle':'Gorevlerini yonet, organize ol',
       'auth.tab.login':'Giris Yap','auth.tab.register':'Kayit Ol','auth.or':'veya',
+      'auth.google':'Google ile giris yap','auth.github':'GitHub ile giris yap','auth.discord':'Discord ile giris yap','auth.apple':'Apple ile giris yap',
       'auth.login.user':'Kullanici Adi','auth.login.user.ph':'Kullanici adiniz',
       'auth.login.pw':'Sifre','auth.login.pw.ph':'Sifreniz','auth.login.pw.aria':'Sifreyi goster/gizle',
       'auth.login.btn':'Giris Yap',
@@ -199,6 +200,7 @@
       'toast.verificationSent':'Verification email sent',
       'auth.back':'Home','auth.subtitle':'Manage your tasks, stay organized',
       'auth.tab.login':'Login','auth.tab.register':'Register','auth.or':'or',
+      'auth.google':'Continue with Google','auth.github':'Continue with GitHub','auth.discord':'Continue with Discord','auth.apple':'Continue with Apple',
       'auth.login.user':'Username','auth.login.user.ph':'Your username',
       'auth.login.pw':'Password','auth.login.pw.ph':'Your password','auth.login.pw.aria':'Show/hide password',
       'auth.login.btn':'Login',
@@ -2108,6 +2110,31 @@
   try { setLanguage(currentLang); } catch (e) { console.error('setLanguage error:', e); }
   updateLandingNav();
   initLanding();
+
+  var urlParams = new URLSearchParams(window.location.search);
+  var loginStatus = urlParams.get('login');
+  if (loginStatus === 'success') {
+    var loginToken = urlParams.get('token');
+    var loginUsername = urlParams.get('username');
+    var loginRole = urlParams.get('role');
+    if (loginToken) {
+      authToken = loginToken;
+      currentUser = loginUsername;
+      currentRole = loginRole || 'user';
+      localStorage.setItem('authToken', loginToken);
+      updateLandingNav();
+      showToast(t('toast.loginOk'), 'success');
+      window.history.replaceState({}, '', '/');
+      loadMain();
+      return;
+    }
+  } else if (loginStatus === 'error') {
+    var errMsg = urlParams.get('error') || 'Giris hatasi';
+    showPage('loginPage', true);
+    showToast(decodeURIComponent(errMsg), 'error');
+    window.history.replaceState({}, '', '/');
+    return;
+  }
 
   var savedPage = 'landingPage';
   try { savedPage = localStorage.getItem('lastPage') || 'landingPage'; } catch (e) {}

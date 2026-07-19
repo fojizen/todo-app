@@ -382,12 +382,27 @@ html.loading .page{display:none!important}
 .auth-form.active{display:flex;flex-direction:column;gap:16px}
 @keyframes authFormIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* Google Auth Divider */
+/* Auth Social Buttons */
 .auth-divider{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .auth-divider span{font-size:.75rem;color:var(--muted);font-weight:500;white-space:nowrap}
-.google-btn-wrap{display:flex;justify-content:center;margin-bottom:20px}
-.google-btn-wrap iframe{margin:0 auto !important}
+.auth-social-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.auth-social-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-family:inherit;font-size:.875rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;text-align:left}
+.auth-social-btn:hover{background:var(--card-h);border-color:var(--border2)}
+.auth-social-btn svg{flex-shrink:0}
+.auth-social-btn.google{border-color:rgba(66,133,244,.25)}
+.auth-social-btn.google:hover{border-color:rgba(66,133,244,.5);background:rgba(66,133,244,.06)}
+.auth-social-btn.github{border-color:rgba(255,255,255,.1)}
+.auth-social-btn.github:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+[data-theme="light"] .auth-social-btn.github{border-color:rgba(0,0,0,.15)}
+[data-theme="light"] .auth-social-btn.github:hover{border-color:rgba(0,0,0,.3);background:rgba(0,0,0,.04)}
+.auth-social-btn.discord{border-color:rgba(88,101,242,.25)}
+.auth-social-btn.discord:hover{border-color:rgba(88,101,242,.5);background:rgba(88,101,242,.06)}
+.auth-social-btn.apple{border-color:rgba(255,255,255,.15)}
+.auth-social-btn.apple:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)}
+[data-theme="light"] .auth-social-btn.apple{border-color:rgba(0,0,0,.15)}
+[data-theme="light"] .auth-social-btn.apple:hover{border-color:rgba(0,0,0,.3);background:rgba(0,0,0,.04)}
+.google-btn-wrap{display:none}
 
 /* ═══════════ MAIN APP ═══════════ */
 .app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;padding-top:calc(12px + var(--safe-top))}

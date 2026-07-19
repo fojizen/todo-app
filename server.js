@@ -26,6 +26,14 @@ if (!process.env.ADMIN_PASSWORD) {
 }
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
+const APPLE_CLIENT_ID = process.env.APPLE_CLIENT_ID || '';
+const APPLE_TEAM_ID = process.env.APPLE_TEAM_ID || '';
+const APPLE_KEY_ID = process.env.APPLE_KEY_ID || '';
+const APPLE_PRIVATE_KEY = (process.env.APPLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://fojizen-todo-app.onrender.com';
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -405,6 +413,165 @@ app.post('/api/auth/google', async (req, res) => {
   } catch (e) {
     console.error('Google auth error:', e.message);
     res.status(401).json({ error: 'Google dogrulama basarisiz' });
+  }
+});
+
+// ── Shared OAuth Helper ──────────────────────────────────
+async function oauthFindOrCreateUser(email, name, provider) {
+  let user = await getOne('SELECT * FROM users WHERE email = $1', [email]);
+  if (!user) {
+    let username = name.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 20) || provider + '_' + Date.now().toString(36).slice(-4);
+    if (username.length < 3) username = username + '_' + Date.now().toString(36).slice(-3);
+    const exists = await getOne('SELECT id FROM users WHERE username = $1', [username]);
+    if (exists) username = username + '_' + Date.now().toString(36).slice(-4);
+    const result = await run(
+      'INSERT INTO users (username, email, passwordhash, role, verified, createdat) VALUES ($1, $2, $3, $4, true, NOW()::text) RETURNING id, username, role',
+      [username, email, provider + '_oauth', 'user']
+    );
+    user = result.rows[0];
+  }
+  await run('UPDATE users SET lastlogin = NOW()::text WHERE id = $1', [user.id]);
+  const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+  return { token, username: user.username, role: user.role };
+}
+
+// ── GitHub Auth ──────────────────────────────────────────
+app.get('/api/auth/github', (req, res) => {
+  if (!GITHUB_CLIENT_ID) return res.status(503).json({ error: 'GitHub giris yapilandirilmamis' });
+  const url = 'https://github.com/login/oauth/authorize?client_id=' + encodeURIComponent(GITHUB_CLIENT_ID) + '&scope=user:email&redirect_uri=' + encodeURIComponent(FRONTEND_URL + '/api/auth/github/callback');
+  res.redirect(url);
+});
+
+app.get('/api/auth/github/callback', async (req, res) => {
+  try {
+    if (!GITHUB_CLIENT_SECRET) throw new Error('GitHub secret yok');
+    if (rateLimit('github:' + req.ip, 10, 60000)) return res.redirect('/?login=error=' + encodeURIComponent('Cok fazla istek'));
+    const { code, error } = req.query;
+    if (error || !code) return res.redirect('/?login=error=' + encodeURIComponent('GitHub dogrulama basarisiz'));
+
+    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ client_id: GITHUB_CLIENT_ID, client_secret: GITHUB_CLIENT_SECRET, code })
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.redirect('/?login=error=' + encodeURIComponent('GitHub token alinamadi'));
+
+    const userRes = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'Bearer ' + tokenData.access_token, 'Accept': 'application/json' }
+    });
+    const ghUser = await userRes.json();
+    if (!ghUser.email) {
+      const emailsRes = await fetch('https://api.github.com/user/emails', {
+        headers: { 'Authorization': 'Bearer ' + tokenData.access_token, 'Accept': 'application/json' }
+      });
+      const emails = await emailsRes.json();
+      const primary = emails.find(function (e) { return e.primary; });
+      ghUser.email = primary ? primary.email : null;
+    }
+    if (!ghUser.email) return res.redirect('/?login=error=' + encodeURIComponent('GitHub e-posta bulunamadi'));
+
+    const data = await oauthFindOrCreateUser(ghUser.email.toLowerCase(), ghUser.name || ghUser.login, 'github');
+    res.redirect('/?login=success&token=' + encodeURIComponent(data.token) + '&username=' + encodeURIComponent(data.username) + '&role=' + encodeURIComponent(data.role));
+  } catch (e) {
+    console.error('GitHub auth error:', e.message);
+    res.redirect('/?login=error=' + encodeURIComponent('GitHub giris hatasi'));
+  }
+});
+
+// ── Discord Auth ─────────────────────────────────────────
+app.get('/api/auth/discord', (req, res) => {
+  if (!DISCORD_CLIENT_ID) return res.status(503).json({ error: 'Discord giris yapilandirilmamis' });
+  const url = 'https://discord.com/api/oauth2/authorize?client_id=' + encodeURIComponent(DISCORD_CLIENT_ID) + '&scope=identify+email&response_type=code&redirect_uri=' + encodeURIComponent(FRONTEND_URL + '/api/auth/discord/callback');
+  res.redirect(url);
+});
+
+app.get('/api/auth/discord/callback', async (req, res) => {
+  try {
+    if (!DISCORD_CLIENT_SECRET) throw new Error('Discord secret yok');
+    if (rateLimit('discord:' + req.ip, 10, 60000)) return res.redirect('/?login=error=' + encodeURIComponent('Cok fazla istek'));
+    const { code, error } = req.query;
+    if (error || !code) return res.redirect('/?login=error=' + encodeURIComponent('Discord dogrulama basarisiz'));
+
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET, grant_type: 'authorization_code', code, redirect_uri: FRONTEND_URL + '/api/auth/discord/callback' })
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.redirect('/?login=error=' + encodeURIComponent('Discord token alinamadi'));
+
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { 'Authorization': 'Bearer ' + tokenData.access_token }
+    });
+    const dcUser = await userRes.json();
+    if (!dcUser.email) return res.redirect('/?login=error=' + encodeURIComponent('Discord e-posta bulunamadi'));
+
+    const data = await oauthFindOrCreateUser(dcUser.email.toLowerCase(), dcUser.username, 'discord');
+    res.redirect('/?login=success&token=' + encodeURIComponent(data.token) + '&username=' + encodeURIComponent(data.username) + '&role=' + encodeURIComponent(data.role));
+  } catch (e) {
+    console.error('Discord auth error:', e.message);
+    res.redirect('/?login=error=' + encodeURIComponent('Discord giris hatasi'));
+  }
+});
+
+// ── Apple Auth ───────────────────────────────────────────
+function generateAppleSecret() {
+  if (!APPLE_PRIVATE_KEY || !APPLE_TEAM_ID || !APPLE_KEY_ID || !APPLE_CLIENT_ID) return null;
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: 'ES256', kid: APPLE_KEY_ID };
+  const payload = {
+    iss: APPLE_TEAM_ID,
+    iat: now,
+    exp: now + 15777000,
+    aud: 'https://appleid.apple.com',
+    sub: APPLE_CLIENT_ID
+  };
+  function base64url(obj) {
+    return Buffer.from(JSON.stringify(obj)).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  }
+  const signingInput = base64url(header) + '.' + base64url(payload);
+  const sign = crypto.createSign('SHA256');
+  sign.update(signingInput);
+  sign.end();
+  const sig = sign.sign(APPLE_PRIVATE_KEY, 'base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return signingInput + '.' + sig;
+}
+
+app.get('/api/auth/apple', (req, res) => {
+  if (!APPLE_CLIENT_ID) return res.status(503).json({ error: 'Apple giris yapilandirilmamis' });
+  const url = 'https://appleid.apple.com/auth/authorize?client_id=' + encodeURIComponent(APPLE_CLIENT_ID) + '&response_type=code id_token&scope=name email&response_mode=form_post&redirect_uri=' + encodeURIComponent(FRONTEND_URL + '/api/auth/apple/callback');
+  res.redirect(url);
+});
+
+app.post('/api/auth/apple/callback', async (req, res) => {
+  try {
+    if (!APPLE_CLIENT_ID) return res.redirect('/?login=error=' + encodeURIComponent('Apple giris yapilandirilmamis'));
+    if (rateLimit('apple:' + req.ip, 10, 60000)) return res.redirect('/?login=error=' + encodeURIComponent('Cok fazla istek'));
+
+    const { id_token, user: userStr, error: appleError } = req.body || {};
+    if (appleError || !id_token) return res.redirect('/?login=error=' + encodeURIComponent('Apple dogrulama basarisiz'));
+
+    const parts = id_token.split('.');
+    if (parts.length !== 3) return res.redirect('/?login=error=' + encodeURIComponent('Gecersiz Apple token'));
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+
+    if (payload.iss !== 'https://appleid.apple.com') return res.redirect('/?login=error=' + encodeURIComponent('Gecersiz Apple token'));
+    if (payload.aud !== APPLE_CLIENT_ID) return res.redirect('/?login=error=' + encodeURIComponent('Gecersiz Apple audiance'));
+    if (payload.exp * 1000 < Date.now()) return res.redirect('/?login=error=' + encodeURIComponent('Apple token suresi dolmus'));
+
+    let email = payload.email;
+    let name = 'apple_user';
+    if (userStr) {
+      try { const u = JSON.parse(userStr); name = (u.name ? u.name.firstName + ' ' + u.name.lastName : '') || name; } catch (e) {}
+    }
+    if (!email) return res.redirect('/?login=error=' + encodeURIComponent('Apple e-posta bulunamadi'));
+
+    const data = await oauthFindOrCreateUser(email.toLowerCase(), name, 'apple');
+    res.redirect('/?login=success&token=' + encodeURIComponent(data.token) + '&username=' + encodeURIComponent(data.username) + '&role=' + encodeURIComponent(data.role));
+  } catch (e) {
+    console.error('Apple auth error:', e.message);
+    res.redirect('/?login=error=' + encodeURIComponent('Apple giris hatasi'));
   }
 });
 
