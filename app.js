@@ -1189,11 +1189,12 @@
       if (starBtn) {
         var sItem = starBtn.closest('.task-item');
         if (sItem) {
+          var sIdx = todos.findIndex(function(x) { return String(x.id) === String(sItem.dataset.id); });
+          if (sIdx !== -1) { todos[sIdx].starred = !todos[sIdx].starred; render(); }
           api('PUT', '/tasks/' + sItem.dataset.id + '/star').then(function(updated) {
             var idx = todos.findIndex(function(x) { return String(x.id) === String(sItem.dataset.id); });
             if (idx !== -1) todos[idx] = updated;
-            render();
-          }).catch(function() { showToast(t('toast.error'), 'error'); });
+          }).catch(function() { showToast(t('toast.error'), 'error'); loadTasks().then(render); });
         }
         return;
       }
@@ -1203,10 +1204,10 @@
       if (delBtn) {
         var dItem = delBtn.closest('.task-item');
         if (dItem && confirm(t('confirm.deleteTask'))) {
-          api('DELETE', '/tasks/' + dItem.dataset.id).then(function () {
-            todos = todos.filter(function (x) { return String(x.id) !== String(dItem.dataset.id); });
-            render(); showToast(t('toast.taskDel'), 'info');
-          }).catch(function () { showToast(t('toast.error'), 'error'); });
+          var delId = dItem.dataset.id;
+          todos = todos.filter(function (x) { return String(x.id) !== String(delId); });
+          render(); showToast(t('toast.taskDel'), 'info');
+          api('DELETE', '/tasks/' + delId).catch(function () { showToast(t('toast.error'), 'error'); loadTasks().then(render); });
         }
         return;
       }
@@ -1221,14 +1222,9 @@
       var task = todos.find(function (x) { return String(x.id) === String(id); });
       if (!task) return;
       task.done = !task.done;
-      api('PUT', '/tasks/' + id, { done: task.done }).then(function () {
-        if (task.done) {
-          awardXP(XP_PER_TASK);
-          updateStreak();
-          fireConfetti();
-        }
-        render(); updateDailyGoal(); loadWeeklyStats();
-      })
+      render();
+      if (task.done) { awardXP(XP_PER_TASK); updateStreak(); fireConfetti(); updateDailyGoal(); loadWeeklyStats(); }
+      api('PUT', '/tasks/' + id, { done: task.done })
         .catch(function () { task.done = !task.done; render(); showToast(t('toast.updated'), 'error'); });
     };
 
@@ -1282,23 +1278,30 @@
     if (!text) return;
     var tags = (document.getElementById('taskTags').value || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     var recurring = document.getElementById('taskRecurring').value || null;
+    var tempId = 'tmp_' + Date.now();
+    var tempTask = { id: tempId, text: text, done: false, starred: false, priority: document.getElementById('taskPriority').value, dueDate: document.getElementById('taskDueDate').value || null, category: document.getElementById('taskCategory').value || '', tags: tags, recurring: recurring, subtasks: pendingSubtasks.slice(), createdAt: new Date().toISOString() };
+    todos.push(tempTask);
+    inp.value = '';
+    document.getElementById('taskTags').value = '';
+    document.getElementById('taskDueDate').value = '';
+    pendingSubtasks = [];
+    var stList = document.getElementById('subtaskList');
+    if (stList) stList.innerHTML = '';
+    render();
+    showToast(t('toast.taskAdd'), 'success');
     api('POST', '/tasks', {
       text: text,
-      priority: document.getElementById('taskPriority').value,
-      dueDate: document.getElementById('taskDueDate').value || null,
-      category: document.getElementById('taskCategory').value || '',
+      priority: tempTask.priority,
+      dueDate: tempTask.dueDate,
+      category: tempTask.category,
       tags: tags,
       recurring: recurring,
-      subtasks: pendingSubtasks.slice()
+      subtasks: tempTask.subtasks
     }).then(function (task) {
-      todos.push(task); inp.value = '';
-      document.getElementById('taskTags').value = '';
-      document.getElementById('taskDueDate').value = '';
-      pendingSubtasks = [];
-      var stList = document.getElementById('subtaskList');
-      if (stList) stList.innerHTML = '';
-      render(); showToast(t('toast.taskAdd'), 'success');
-    }).catch(function (err) { showToast(err.message || t('toast.noTask'), 'error'); });
+      var idx = todos.findIndex(function(x) { return String(x.id) === tempId; });
+      if (idx !== -1) todos[idx] = task;
+      render();
+    }).catch(function () { todos = todos.filter(function(x) { return String(x.id) !== tempId; }); render(); showToast(t('toast.noTask'), 'error'); });
   });
 
   var toggleExtrasEl = document.getElementById('toggleExtras');
@@ -1741,7 +1744,7 @@
     var task = todos.find(function (x) { return String(x.id) === String(editingId); });
     if (!task) return;
     var tags = document.getElementById('editTags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-    api('PUT', '/tasks/' + editingId, {
+    var updatedFields = {
       text: document.getElementById('editText').value.trim(),
       done: document.getElementById('editDone').checked,
       starred: document.getElementById('editStarred').checked,
@@ -1751,21 +1754,23 @@
       tags: tags,
       recurring: document.getElementById('editRecurring').value || null,
       subtasks: editingSubtasks
-    }).then(function (updated) {
-      var idx = todos.findIndex(function (x) { return String(x.id) === String(editingId); });
-      if (idx !== -1) todos[idx] = updated;
-      document.getElementById('editModal').close();
-      render(); showToast(t('toast.taskEdit'), 'success');
-    }).catch(function (err) { showToast(err.message || t('toast.error'), 'error'); });
+    };
+    var idx = todos.findIndex(function (x) { return String(x.id) === String(editingId); });
+    if (idx !== -1) Object.assign(todos[idx], updatedFields);
+    document.getElementById('editModal').close();
+    render(); showToast(t('toast.taskEdit'), 'success');
+    api('PUT', '/tasks/' + editingId, updatedFields).then(function (updated) {
+      var i = todos.findIndex(function (x) { return String(x.id) === String(editingId); });
+      if (i !== -1) todos[i] = updated;
+    }).catch(function (err) { showToast(err.message || t('toast.error'), 'error'); loadTasks().then(render); });
   });
 
   var editDeleteBtnEl = document.getElementById('editDeleteBtn');
-  if (editDeleteBtnEl) editDeleteBtnEl.addEventListener('click', function () {
+    if (editDeleteBtnEl) editDeleteBtnEl.addEventListener('click', function () {
     if (!confirm(t('confirm.deleteTask'))) return;
-    api('DELETE', '/tasks/' + editingId).then(function () {
-      todos = todos.filter(function (x) { return String(x.id) !== String(editingId); });
-      document.getElementById('editModal').close(); render(); showToast(t('toast.taskDel'), 'info');
-    }).catch(function () { showToast(t('toast.error'), 'error'); });
+    todos = todos.filter(function (x) { return String(x.id) !== String(editingId); });
+    document.getElementById('editModal').close(); render(); showToast(t('toast.taskDel'), 'info');
+    api('DELETE', '/tasks/' + editingId).catch(function () { showToast(t('toast.error'), 'error'); loadTasks().then(render); });
   });
 
   /* ── Modals close ── */
