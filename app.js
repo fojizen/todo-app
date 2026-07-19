@@ -1400,6 +1400,7 @@
   function initSidebar() {
     sidebarEl = document.getElementById('appSidebar');
     sidebarMobileOverlay = document.getElementById('sidebarMobileOverlay');
+    if (sidebarMobileOverlay) sidebarMobileOverlay.addEventListener('click', closeSidebar);
   }
 
   function toggleSidebar() {
@@ -1864,7 +1865,6 @@
   /* ── Sidebar Events ── */
   var sidebarToggleBtn = document.getElementById('sidebarToggle');
   if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
-  if (sidebarMobileOverlay) sidebarMobileOverlay.addEventListener('click', closeSidebar);
 
   document.querySelectorAll('.sb-filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
