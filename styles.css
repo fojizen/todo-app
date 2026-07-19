@@ -861,7 +861,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
    ═══════════════════════════════════════ */
 @media(max-width:900px){
   .sidebar-toggle-btn{display:flex!important}
-  .app-sidebar{position:fixed;top:0;left:0;bottom:0;z-index:41;transform:translateX(-100%);box-shadow:none}
+  .app-sidebar{position:fixed;top:0;left:0;bottom:0;z-index:51;transform:translateX(-100%);box-shadow:none}
   .app-sidebar.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.4)}
 }
 @media(min-width:901px){
