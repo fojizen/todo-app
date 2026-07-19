@@ -1604,8 +1604,22 @@
   function setPomoDurDisabled(disabled) {
     var m = document.getElementById('pomoMinus');
     var p = document.getElementById('pomoPlus');
+    var inp = document.getElementById('pomoDurInput');
     if (m) m.disabled = disabled;
     if (p) p.disabled = disabled;
+    if (inp) inp.disabled = disabled;
+  }
+
+  function applyPomoDuration(val) {
+    val = Math.max(1, Math.min(120, parseInt(val) || 25));
+    pomoState.duration = val;
+    var inp = document.getElementById('pomoDurInput');
+    if (inp) inp.value = val;
+    if (!pomoState.running) {
+      pomoState.seconds = val * 60;
+      var timeEl = document.getElementById('pomoTime');
+      if (timeEl) timeEl.textContent = formatPomoTime(val * 60);
+    }
   }
 
   function pomoStart() {
@@ -1884,22 +1898,25 @@
   if (pomoResetBtn) pomoResetBtn.addEventListener('click', pomoReset);
 
   function updatePomoDurDisplay() {
-    var durEl = document.getElementById('pomoDurVal');
-    if (durEl) durEl.textContent = pomoState.duration;
-    var timeEl = document.getElementById('pomoTime');
-    if (timeEl && !pomoState.running) timeEl.textContent = formatPomoTime(pomoState.duration * 60);
+    applyPomoDuration(pomoState.duration);
   }
   var pomoMinusBtn = document.getElementById('pomoMinus');
   var pomoPlusBtn = document.getElementById('pomoPlus');
+  var pomoDurInput = document.getElementById('pomoDurInput');
   if (pomoMinusBtn) pomoMinusBtn.addEventListener('click', function() {
     if (pomoState.running) return;
-    pomoState.duration = Math.max(1, pomoState.duration - 5);
-    updatePomoDurDisplay();
+    applyPomoDuration(pomoState.duration - 1);
   });
   if (pomoPlusBtn) pomoPlusBtn.addEventListener('click', function() {
     if (pomoState.running) return;
-    pomoState.duration = Math.min(120, pomoState.duration + 5);
-    updatePomoDurDisplay();
+    applyPomoDuration(pomoState.duration + 1);
+  });
+  if (pomoDurInput) pomoDurInput.addEventListener('change', function() {
+    if (pomoState.running) return;
+    applyPomoDuration(this.value);
+  });
+  if (pomoDurInput) pomoDurInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); if (!pomoState.running) applyPomoDuration(this.value); this.blur(); }
   });
 
   /* ── Subtask Events (Task Form) ── */
