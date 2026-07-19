@@ -1492,6 +1492,8 @@
           api('DELETE', '/categories/' + btn.dataset.id).then(function() {
             categories = categories.filter(function(c) { return String(c.id) !== String(btn.dataset.id); });
             renderSidebarCategories();
+            renderCategorySelects();
+            updateCategoryFilter();
             showToast(t('toast.catDeleted'), 'info');
           }).catch(function() { showToast(t('toast.error'), 'error'); });
         }
@@ -1879,6 +1881,8 @@
     api('POST', '/categories', { name: name.trim(), color: color }).then(function(cat) {
       categories.push(cat);
       renderSidebarCategories();
+      renderCategorySelects();
+      updateCategoryFilter();
       showToast(t('toast.catAdded'), 'success');
     }).catch(function(err) { showToast(err.message || t('toast.error'), 'error'); });
   });
