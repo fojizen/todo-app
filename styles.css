@@ -728,8 +728,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .sb-section-title{font-size:.6875rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
 
 /* Gamification Bar */
-.sb-gamification{padding:16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(124,92,255,.08),rgba(6,182,212,.06));position:relative}
-.sb-level-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sb-gamification{padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(6,182,212,.08))}
+.sb-level-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .sb-level-badge{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.875rem;font-weight:800;flex-shrink:0;box-shadow:0 2px 12px rgba(124,92,255,.3)}
 .sb-level-info{flex:1;min-width:0}
 .sb-level-label{font-size:.75rem;font-weight:600;color:var(--text2);display:block;margin-bottom:4px}
