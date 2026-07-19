@@ -603,15 +603,18 @@
     var welcomeEl = document.getElementById('userWelcome');
     if (welcomeEl) welcomeEl.textContent = t('welcome.prefix') + ' ' + currentUser + '!';
     showAdminBtn();
-    showLoader();
     initSidebar();
-    Promise.all([loadTasks(), loadCategories(), loadUserProfile(), loadWeeklyStats()]).then(function () {
+    loadTasks().then(function () {
       showPage('mainPage', true);
       render();
+      loadCategories();
+      loadUserProfile();
+      loadWeeklyStats();
       updateDailyGoal();
     }).catch(function (err) {
-      hideLoader();
       if (err.message === 'Internet baglantisi yok') {
+        showPage('mainPage', true);
+        render();
         showToast('Internet baglantisi yok', 'error');
         return;
       }
@@ -622,6 +625,8 @@
         currentRole = null;
         showPage('loginPage', true);
       } else {
+        showPage('mainPage', true);
+        render();
         showToast(err.message || 'Bir hata olustu', 'error');
       }
     });
