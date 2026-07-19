@@ -1408,6 +1408,7 @@
     var isOpen = sidebarEl.classList.contains('open');
     sidebarEl.classList.toggle('open');
     if (sidebarMobileOverlay) sidebarMobileOverlay.classList.toggle('open');
+    if (!isOpen && sidebarEl) sidebarEl.scrollTop = 0;
   }
 
   function closeSidebar() {
