@@ -132,7 +132,7 @@
       'admin.btn.edit':'Duzenle','admin.btn.unban':'Ban kaldir','admin.btn.ban':'Banla','admin.btn.del':'Sil',
       'admin.usersLoadErr':'Kullanicialar yuklenemedi',
       'sb.level':'Seviye','sb.streak':'gun seri','sb.quickFilters':'Hizli Filtreler',
-      'sb.allTasks':'Tum Gorevler','sb.today':'Bugun','sb.thisWeek':'Bu Hafta','sb.overdue':'Gecikmis','sb.starred':'Yildizli',
+      'sb.allTasks':'Tum Gorevler','sb.today':'Bugun','sb.thisWeek':'Bu Hafta','sb.overdue':'Gecikmis','sb.starred':'Yildizli','sb.completed':'Tamamlanan',
       'sb.categories':'Kategoriler','sb.addCategory':'Kategori Ekle','sb.catName':'Kategori adi',
       'sb.focus':'Odaklanma','sb.pomo.ready':'Hazir','sb.pomo.running':'Devam ediyor','sb.pomo.break':'Mola',
       'sb.pomo.start':'Baslat','sb.pomo.pause':'Duraklat','sb.pomo.reset':'Sifirla','sb.pomo.done':'Mola zamanı!',
@@ -247,7 +247,7 @@
       'admin.btn.edit':'Edit','admin.btn.unban':'Unban','admin.btn.ban':'Ban','admin.btn.del':'Delete',
       'admin.usersLoadErr':'Could not load users',
       'sb.level':'Level','sb.streak':'day streak','sb.quickFilters':'Quick Filters',
-      'sb.allTasks':'All Tasks','sb.today':'Today','sb.thisWeek':'This Week','sb.overdue':'Overdue','sb.starred':'Starred',
+      'sb.allTasks':'All Tasks','sb.today':'Today','sb.thisWeek':'This Week','sb.overdue':'Overdue','sb.starred':'Starred','sb.completed':'Completed',
       'sb.categories':'Categories','sb.addCategory':'Add Category','sb.catName':'Category name',
       'sb.focus':'Focus Timer','sb.pomo.ready':'Ready','sb.pomo.running':'Running','sb.pomo.break':'Break',
       'sb.pomo.start':'Start','sb.pomo.pause':'Pause','sb.pomo.reset':'Reset','sb.pomo.done':'Break time!',
@@ -1112,6 +1112,8 @@
       list = list.filter(function(x) { return !x.done && isOverdue(x.dueDate); });
     } else if (filter.quickFilter === 'starred') {
       list = list.filter(function(x) { return x.starred; });
+    } else if (filter.quickFilter === 'completed') {
+      list = list.filter(function(x) { return x.done; });
     }
     if (filter.search) {
       var q = filter.search.toLowerCase();
@@ -1405,12 +1407,14 @@
     }).length;
     var overdue = todos.filter(function(x) { return !x.done && isOverdue(x.dueDate); }).length;
     var starred = todos.filter(function(x) { return x.starred; }).length;
+    var completed = todos.filter(function(x) { return x.done; }).length;
     var el = function(id) { return document.getElementById(id); };
     if (el('sbCountAll')) el('sbCountAll').textContent = all;
     if (el('sbCountToday')) el('sbCountToday').textContent = todayCount;
     if (el('sbCountWeek')) el('sbCountWeek').textContent = weekCount;
     if (el('sbCountOverdue')) el('sbCountOverdue').textContent = overdue;
     if (el('sbCountStarred')) el('sbCountStarred').textContent = starred;
+    if (el('sbCountCompleted')) el('sbCountCompleted').textContent = completed;
   }
 
   function renderSidebarCategories() {
