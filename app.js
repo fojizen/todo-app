@@ -916,9 +916,9 @@
 
     document.addEventListener('click', function (e) {
       var ctaBtn = e.target.closest('.lp-cta-main, .lp-cta-final, .lp-register-btn');
-      if (ctaBtn) { if (currentUser) { loadMain(); } else { switchTab('register'); navigateTo('loginPage'); } return; }
+      if (ctaBtn) { if (currentUser) { loadMain(); } else { switchTab('register'); showPage('loginPage', true); } return; }
       var loginBtn = e.target.closest('.lp-login-btn');
-      if (loginBtn) { switchTab('login'); navigateTo('loginPage'); return; }
+      if (loginBtn) { switchTab('login'); showPage('loginPage', true); return; }
       var anchor = e.target.closest('a[href^="#"]');
       if (anchor) {
         var href = anchor.getAttribute('href');
