@@ -25,6 +25,7 @@ if (!process.env.ADMIN_PASSWORD) {
   process.exit(1);
 }
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://fojizen-todo-app.onrender.com';
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -87,8 +88,9 @@ app.use((req, res, next) => {
     "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com; " +
-    "img-src 'self' data:; " +
-    "script-src 'self'"
+    "img-src 'self' data: https://*.googleusercontent.com; " +
+    "frame-src 'self' https://accounts.google.com; " +
+    "script-src 'self' 'unsafe-inline' https://accounts.google.com https://gsi.client"
   );
   next();
 });
@@ -97,8 +99,20 @@ app.use((req, res, next) => {
 app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'); res.set('Pragma', 'no-cache'); res.set('Expires', '0'); next(); });
 
 // Static files
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/', (req, res) => {
+  const fs = require('fs');
+  let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  html = html.replace('__GOOGLE_CLIENT_ID__', GOOGLE_CLIENT_ID);
+  res.set('Content-Type', 'text/html');
+  res.send(html);
+});
+app.get('/index.html', (req, res) => {
+  const fs = require('fs');
+  let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  html = html.replace('__GOOGLE_CLIENT_ID__', GOOGLE_CLIENT_ID);
+  res.set('Content-Type', 'text/html');
+  res.send(html);
+});
 app.get('/app.js', (req, res) => res.sendFile(path.join(__dirname, 'app.js')));
 app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, 'styles.css')));
 app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'favicon.svg')));
@@ -344,6 +358,53 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/logout', (req, res) => {
   res.clearCookie('token', { path: '/' });
   res.json({ ok: true });
+});
+
+// ── Google Auth ──────────────────────────────────────────
+async function verifyGoogleToken(idToken) {
+  const resp = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken));
+  if (!resp.ok) throw new Error('Invalid Google token');
+  const payload = await resp.json();
+  if (payload.aud !== GOOGLE_CLIENT_ID) throw new Error('Invalid audience');
+  if (Number(payload.exp) * 1000 < Date.now()) throw new Error('Token expired');
+  return payload;
+}
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    if (!GOOGLE_CLIENT_ID) return res.status(503).json({ error: 'Google giris yapilandirilmamis' });
+    if (rateLimit('google:' + req.ip, 10, 60000)) return res.status(429).json({ error: 'Cok fazla istek' });
+
+    const { credential } = req.body || {};
+    if (!credential) return res.status(400).json({ error: 'Credential gerekli' });
+
+    const google = await verifyGoogleToken(credential);
+    const email = google.email.toLowerCase();
+    const name = google.name || email.split('@')[0];
+    const avatar = google.picture || '';
+
+    let user = await getOne('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (!user) {
+      let username = name.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 20) || 'user_' + Date.now();
+      if (username.length < 3) username = username + '_' + Date.now().toString(36).slice(-3);
+      const exists = await getOne('SELECT id FROM users WHERE username = $1', [username]);
+      if (exists) username = username + '_' + Date.now().toString(36).slice(-4);
+      const result = await run(
+        'INSERT INTO users (username, email, passwordhash, role, verified, createdat) VALUES ($1, $2, $3, $4, true, NOW()::text) RETURNING id, username, role',
+        [username, email, 'google_oauth', 'user']
+      );
+      user = result.rows[0];
+    }
+
+    await run('UPDATE users SET lastlogin = NOW()::text WHERE id = $1', [user.id]);
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+    setTokenCookie(res, token);
+    res.json({ token, username: user.username, role: user.role });
+  } catch (e) {
+    console.error('Google auth error:', e.message);
+    res.status(401).json({ error: 'Google dogrulama basarisiz' });
+  }
 });
 
 app.get('/api/me', auth, async (req, res) => {

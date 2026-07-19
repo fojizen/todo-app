@@ -83,7 +83,7 @@
       'verify.close':'Tamam','verify.resend':'Tekrar Gonder',
       'toast.verificationSent':'Dogrulama epostasi gonderildi',
       'auth.back':'Anasayfa','auth.subtitle':'Gorevlerini yonet, organize ol',
-      'auth.tab.login':'Giris Yap','auth.tab.register':'Kayit Ol',
+      'auth.tab.login':'Giris Yap','auth.tab.register':'Kayit Ol','auth.or':'veya',
       'auth.login.user':'Kullanici Adi','auth.login.user.ph':'Kullanici adiniz',
       'auth.login.pw':'Sifre','auth.login.pw.ph':'Sifreniz','auth.login.pw.aria':'Sifreyi goster/gizle',
       'auth.login.btn':'Giris Yap',
@@ -198,7 +198,7 @@
       'verify.close':'OK','verify.resend':'Resend',
       'toast.verificationSent':'Verification email sent',
       'auth.back':'Home','auth.subtitle':'Manage your tasks, stay organized',
-      'auth.tab.login':'Login','auth.tab.register':'Register',
+      'auth.tab.login':'Login','auth.tab.register':'Register','auth.or':'or',
       'auth.login.user':'Username','auth.login.user.ph':'Your username',
       'auth.login.pw':'Password','auth.login.pw.ph':'Your password','auth.login.pw.aria':'Show/hide password',
       'auth.login.btn':'Login',
@@ -738,6 +738,43 @@
   var registerTab = document.getElementById('registerTab');
   if (loginTab) loginTab.addEventListener('click', function () { switchTab('login'); });
   if (registerTab) registerTab.addEventListener('click', function () { switchTab('register'); });
+
+  /* Google Sign-In */
+  function initGoogleSignIn() {
+    if (typeof google === 'undefined' || !google.accounts || !GOOGLE_CLIENT_ID) return;
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: function (response) {
+        if (!response.credential) return;
+        setBtnLoading(document.getElementById('loginBtn'), true);
+        api('POST', '/auth/google', { credential: response.credential }).then(function (data) {
+          authToken = data.token; currentUser = data.username; currentRole = data.role || 'user';
+          localStorage.setItem('authToken', data.token);
+          updateLandingNav();
+          showToast(t('toast.loginOk'), 'success');
+          loadMain();
+        }).catch(function (err) {
+          showToast(err.message || 'Google giris basarisiz', 'error');
+        }).finally(function () {
+          setBtnLoading(document.getElementById('loginBtn'), false);
+        });
+      }
+    });
+    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), {
+      theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
+      size: 'large',
+      width: 320,
+      text: 'continue_with',
+      shape: 'rectangular'
+    });
+  }
+  if (typeof google !== 'undefined' && google.accounts) {
+    initGoogleSignIn();
+  } else {
+    window.addEventListener('load', function () {
+      setTimeout(initGoogleSignIn, 500);
+    });
+  }
 
   /* Password toggle */
   document.querySelectorAll('.toggle-pw').forEach(function (btn) {

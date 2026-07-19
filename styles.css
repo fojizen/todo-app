@@ -382,6 +382,13 @@ html.loading .page{display:none!important}
 .auth-form.active{display:flex;flex-direction:column;gap:16px}
 @keyframes authFormIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
+/* Google Auth Divider */
+.auth-divider{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-divider span{font-size:.75rem;color:var(--muted);font-weight:500;white-space:nowrap}
+.google-btn-wrap{display:flex;justify-content:center;margin-bottom:20px}
+.google-btn-wrap iframe{margin:0 auto !important}
+
 /* ═══════════ MAIN APP ═══════════ */
 .app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;padding-top:calc(12px + var(--safe-top))}
 .header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
