@@ -27,7 +27,7 @@
   var userProfile = { xp: 0, level: 1, streak: 0, lastcompletiondate: null, dailygoal: 5, weeklygoal: 25 };
   var pendingSubtasks = [];
   var editingSubtasks = [];
-  var pomoState = { running: false, paused: false, seconds: 25 * 60, interval: null, taskId: null };
+  var pomoState = { running: false, paused: false, seconds: 25 * 60, duration: 25, interval: null, taskId: null };
 
   /* ── i18n ── */
   var currentLang = localStorage.getItem('lang') || 'tr';
@@ -1601,6 +1601,13 @@
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
+  function setPomoDurDisabled(disabled) {
+    var m = document.getElementById('pomoMinus');
+    var p = document.getElementById('pomoPlus');
+    if (m) m.disabled = disabled;
+    if (p) p.disabled = disabled;
+  }
+
   function pomoStart() {
     if (pomoState.running && !pomoState.paused) {
       clearInterval(pomoState.interval);
@@ -1623,7 +1630,8 @@
     }
     pomoState.running = true;
     pomoState.paused = false;
-    pomoState.seconds = 25 * 60;
+    pomoState.seconds = pomoState.duration * 60;
+    setPomoDurDisabled(true);
     var btn3 = document.getElementById('pomoStart');
     if (btn3) btn3.textContent = t('sb.pomo.pause');
     var lbl3 = document.getElementById('pomoLabel');
@@ -1640,9 +1648,10 @@
       clearInterval(pomoState.interval);
       pomoState.running = false;
       pomoState.paused = false;
-      pomoState.seconds = 25 * 60;
+      pomoState.seconds = pomoState.duration * 60;
+      setPomoDurDisabled(false);
       var el2 = document.getElementById('pomoTime');
-      if (el2) el2.textContent = formatPomoTime(25 * 60);
+      if (el2) el2.textContent = formatPomoTime(pomoState.duration * 60);
       var btn = document.getElementById('pomoStart');
       if (btn) btn.textContent = t('sb.pomo.start');
       var lbl = document.getElementById('pomoLabel');
@@ -1655,9 +1664,10 @@
     clearInterval(pomoState.interval);
     pomoState.running = false;
     pomoState.paused = false;
-    pomoState.seconds = 25 * 60;
+    pomoState.seconds = pomoState.duration * 60;
+    setPomoDurDisabled(false);
     var el = document.getElementById('pomoTime');
-    if (el) el.textContent = formatPomoTime(25 * 60);
+    if (el) el.textContent = formatPomoTime(pomoState.duration * 60);
     var btn = document.getElementById('pomoStart');
     if (btn) btn.textContent = t('sb.pomo.start');
     var lbl = document.getElementById('pomoLabel');
@@ -1872,6 +1882,25 @@
   var pomoResetBtn = document.getElementById('pomoReset');
   if (pomoStartBtn) pomoStartBtn.addEventListener('click', pomoStart);
   if (pomoResetBtn) pomoResetBtn.addEventListener('click', pomoReset);
+
+  function updatePomoDurDisplay() {
+    var durEl = document.getElementById('pomoDurVal');
+    if (durEl) durEl.textContent = pomoState.duration;
+    var timeEl = document.getElementById('pomoTime');
+    if (timeEl && !pomoState.running) timeEl.textContent = formatPomoTime(pomoState.duration * 60);
+  }
+  var pomoMinusBtn = document.getElementById('pomoMinus');
+  var pomoPlusBtn = document.getElementById('pomoPlus');
+  if (pomoMinusBtn) pomoMinusBtn.addEventListener('click', function() {
+    if (pomoState.running) return;
+    pomoState.duration = Math.max(1, pomoState.duration - 5);
+    updatePomoDurDisplay();
+  });
+  if (pomoPlusBtn) pomoPlusBtn.addEventListener('click', function() {
+    if (pomoState.running) return;
+    pomoState.duration = Math.min(120, pomoState.duration + 5);
+    updatePomoDurDisplay();
+  });
 
   /* ── Subtask Events (Task Form) ── */
   var subtaskInputEl = document.getElementById('subtaskInput');
