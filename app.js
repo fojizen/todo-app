@@ -369,7 +369,7 @@
       _pendingTasks[key] = true;
       setTimeout(function () { delete _pendingTasks[key]; }, 1000);
     }
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
+    var opts = { method: method, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, no-cache, must-revalidate' }, credentials: 'include', cache: 'no-store' };
     if (authToken) opts.headers['Authorization'] = 'Bearer ' + authToken;
     if (body) opts.body = JSON.stringify(body);
     return fetch(API + path, opts).then(function (res) {
