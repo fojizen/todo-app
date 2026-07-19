@@ -49,6 +49,20 @@ async function run(sql, params = []) {
   return { changes: result.rowCount, rows: result.rows };
 }
 
+function normalizeTask(t) {
+  if (!t) return t;
+  try { t.tags = t.tags ? (typeof t.tags === 'string' ? JSON.parse(t.tags) : t.tags) : []; } catch { t.tags = []; }
+  try { t.subtasks = t.subtasks ? (typeof t.subtasks === 'string' ? JSON.parse(t.subtasks) : t.subtasks) : []; } catch { t.subtasks = []; }
+  t.done = !!t.done;
+  t.starred = !!t.starred;
+  t.dueDate = t.duedate || null;
+  t.createdAt = t.createdat || t.createdAt;
+  t.updatedAt = t.updatedat || t.updatedAt;
+  t.itemOrder = t.itemorder || t.itemOrder;
+  delete t.duedate; delete t.createdat; delete t.updatedat; delete t.itemorder; delete t.userid;
+  return t;
+}
+
 // ── Middleware ───────────────────────────────────────────
 app.set('trust proxy', 1);
 
@@ -342,12 +356,7 @@ app.get('/api/check-username/:username', async (req, res) => {
 app.get('/api/tasks', auth, async (req, res) => {
   try {
     const tasks = await getAll('SELECT * FROM tasks WHERE userid = $1 ORDER BY itemorder ASC', [req.user.id]);
-    tasks.forEach(t => {
-      try { t.tags = t.tags ? JSON.parse(t.tags) : []; } catch { t.tags = []; }
-      try { t.subtasks = t.subtasks ? JSON.parse(t.subtasks) : []; } catch { t.subtasks = []; }
-      t.done = !!t.done;
-      t.starred = !!t.starred;
-    });
+    tasks.forEach(t => normalizeTask(t));
     res.json(tasks);
   } catch (e) {
     console.error('Tasks error:', e.stack);
@@ -374,7 +383,7 @@ app.post('/api/tasks', auth, async (req, res) => {
     );
 
     const task = result.rows[0];
-    if (task) { try { task.tags = task.tags ? JSON.parse(task.tags) : []; } catch { task.tags = []; } try { task.subtasks = task.subtasks ? JSON.parse(task.subtasks) : []; } catch { task.subtasks = []; } task.done = !!task.done; task.starred = !!task.starred; }
+    if (task) normalizeTask(task);
     res.json(task);
   } catch (e) {
     console.error('Task create error:', e.stack);
@@ -410,7 +419,7 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
       ]);
 
     const updated = await getOne('SELECT * FROM tasks WHERE id = $1', [id]);
-    if (updated) { try { updated.tags = updated.tags ? JSON.parse(updated.tags) : []; } catch { updated.tags = []; } try { updated.subtasks = updated.subtasks ? JSON.parse(updated.subtasks) : []; } catch { updated.subtasks = []; } updated.done = !!updated.done; updated.starred = !!updated.starred; }
+    if (updated) normalizeTask(updated);
     res.json(updated);
   } catch (e) {
     console.error('Task update error:', e.stack);
@@ -634,7 +643,7 @@ app.put('/api/tasks/:id/star', auth, async (req, res) => {
     const newStarred = !task.starred;
     await run('UPDATE tasks SET starred = $1, updatedat = NOW()::text WHERE id = $2', [newStarred, req.params.id]);
     const updated = await getOne('SELECT * FROM tasks WHERE id = $1', [req.params.id]);
-    if (updated) { try { updated.tags = updated.tags ? JSON.parse(updated.tags) : []; } catch { updated.tags = []; } try { updated.subtasks = updated.subtasks ? JSON.parse(updated.subtasks) : []; } catch { updated.subtasks = []; } updated.done = !!updated.done; updated.starred = !!updated.starred; }
+    if (updated) normalizeTask(updated);
     res.json(updated);
   } catch (e) {
     console.error('Star toggle error:', e.stack);
