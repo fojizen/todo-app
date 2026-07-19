@@ -1221,9 +1221,11 @@
       var id = li.dataset.id;
       var task = todos.find(function (x) { return String(x.id) === String(id); });
       if (!task) return;
+      var wasDone = !task.done;
       task.done = !task.done;
+      if (task.done && !task.completedOnce) { task.completedOnce = true; awardXP(XP_PER_TASK); updateStreak(); fireConfetti(); }
+      if (task.done) { updateDailyGoal(); loadWeeklyStats(); }
       render();
-      if (task.done) { awardXP(XP_PER_TASK); updateStreak(); fireConfetti(); updateDailyGoal(); loadWeeklyStats(); }
       api('PUT', '/tasks/' + id, { done: task.done })
         .catch(function () { task.done = !task.done; render(); showToast(t('toast.updated'), 'error'); });
     };
@@ -1744,9 +1746,11 @@
     var task = todos.find(function (x) { return String(x.id) === String(editingId); });
     if (!task) return;
     var tags = document.getElementById('editTags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var newDone = document.getElementById('editDone').checked;
+    if (newDone && !task.done && !task.completedOnce) { task.completedOnce = true; awardXP(XP_PER_TASK); updateStreak(); fireConfetti(); }
     var updatedFields = {
       text: document.getElementById('editText').value.trim(),
-      done: document.getElementById('editDone').checked,
+      done: newDone,
       starred: document.getElementById('editStarred').checked,
       priority: document.getElementById('editPriority').value,
       dueDate: document.getElementById('editDueDate').value || null,

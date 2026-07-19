@@ -55,11 +55,12 @@ function normalizeTask(t) {
   try { t.subtasks = t.subtasks ? (typeof t.subtasks === 'string' ? JSON.parse(t.subtasks) : t.subtasks) : []; } catch { t.subtasks = []; }
   t.done = !!t.done;
   t.starred = !!t.starred;
+  t.completedOnce = !!t.completedonce;
   t.dueDate = t.duedate || null;
   t.createdAt = t.createdat || t.createdAt;
   t.updatedAt = t.updatedat || t.updatedAt;
   t.itemOrder = t.itemorder || t.itemOrder;
-  delete t.duedate; delete t.createdat; delete t.updatedat; delete t.itemorder; delete t.userid;
+  delete t.duedate; delete t.createdat; delete t.updatedat; delete t.itemorder; delete t.userid; delete t.completedonce;
   return t;
 }
 
@@ -424,10 +425,13 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
     if (priority && !['low', 'medium', 'high'].includes(priority)) return res.status(400).json({ error: 'Gecersiz oncelik' });
     if (recurring && !['daily', 'weekly', 'monthly'].includes(recurring)) return res.status(400).json({ error: 'Gecersiz tekrar' });
 
-    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, starred = $7, recurring = $8, subtasks = $9, updatedat = NOW()::text WHERE id = $10',
+    const newDone = done !== undefined ? (done ? true : false) : task.done;
+    const markCompletedOnce = newDone && !task.done && !task.completedonce;
+
+    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, starred = $7, recurring = $8, subtasks = $9, updatedat = NOW()::text' + (markCompletedOnce ? ', completedonce = true' : '') + ' WHERE id = $10',
       [
         text !== undefined ? text.trim() : task.text,
-        done !== undefined ? (done ? true : false) : task.done,
+        newDone,
         priority || task.priority,
         dueDate !== undefined ? dueDate : task.duedate,
         category !== undefined ? category : task.category,
@@ -744,6 +748,7 @@ app.use((err, req, res, next) => { console.error('Unhandled:', err.stack || err.
   await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS starred BOOLEAN DEFAULT false');
   await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS recurring TEXT');
   await pool.query("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS subtasks TEXT DEFAULT '[]'");
+  await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS completedOnce BOOLEAN DEFAULT false');
 
   // Categories table
   await pool.query(`
