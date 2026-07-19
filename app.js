@@ -1508,7 +1508,7 @@
     return api('GET', '/user/profile').then(function(data) {
       if (data) userProfile = data;
       renderGamification();
-    }).catch(function() {});
+    }).catch(function() { renderGamification(); });
   }
 
   function saveUserProfile(updates) {
