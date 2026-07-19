@@ -344,7 +344,9 @@ app.get('/api/tasks', auth, async (req, res) => {
     const tasks = await getAll('SELECT * FROM tasks WHERE userid = $1 ORDER BY itemorder ASC', [req.user.id]);
     tasks.forEach(t => {
       try { t.tags = t.tags ? JSON.parse(t.tags) : []; } catch { t.tags = []; }
+      try { t.subtasks = t.subtasks ? JSON.parse(t.subtasks) : []; } catch { t.subtasks = []; }
       t.done = !!t.done;
+      t.starred = !!t.starred;
     });
     res.json(tasks);
   } catch (e) {
@@ -357,21 +359,22 @@ app.post('/api/tasks', auth, async (req, res) => {
   try {
     if (rateLimit('tasks:' + req.user.id, 60, 60000)) return res.status(429).json({ error: 'Cok fazla istek' });
 
-    const { text, priority, dueDate, category, tags } = req.body || {};
+    const { text, priority, dueDate, category, tags, starred, recurring, subtasks } = req.body || {};
     if (!text || !text.trim()) return res.status(400).json({ error: 'Gorev metni gerekli' });
     if (text.trim().length > 500) return res.status(400).json({ error: 'Gorev metni en fazla 500 karakter' });
     if (priority && !['low', 'medium', 'high'].includes(priority)) return res.status(400).json({ error: 'Gecersiz oncelik' });
+    if (recurring && !['daily', 'weekly', 'monthly'].includes(recurring)) return res.status(400).json({ error: 'Gecersiz tekrar' });
 
     const maxOrder = await getOne('SELECT COALESCE(MAX(itemorder), 0) AS mx FROM tasks WHERE userid = $1', [req.user.id]);
     const order = (maxOrder.mx || 0) + 1;
 
     const result = await run(
-      'INSERT INTO tasks (userid, text, done, priority, duedate, category, tags, itemorder, createdat, updatedat) VALUES ($1, $2, false, $3, $4, $5, $6, $7, NOW()::text, NOW()::text) RETURNING *',
-      [req.user.id, text.trim(), priority || 'medium', dueDate || null, category || '', JSON.stringify(tags || []), order]
+      'INSERT INTO tasks (userid, text, done, priority, duedate, category, tags, itemorder, starred, recurring, subtasks, createdat, updatedat) VALUES ($1, $2, false, $3, $4, $5, $6, $7, $8, $9, $10, NOW()::text, NOW()::text) RETURNING *',
+      [req.user.id, text.trim(), priority || 'medium', dueDate || null, category || '', JSON.stringify(tags || []), order, starred || false, recurring || null, JSON.stringify(subtasks || [])]
     );
 
     const task = result.rows[0];
-    if (task) { try { task.tags = task.tags ? JSON.parse(task.tags) : []; } catch { task.tags = []; } task.done = !!task.done; }
+    if (task) { try { task.tags = task.tags ? JSON.parse(task.tags) : []; } catch { task.tags = []; } try { task.subtasks = task.subtasks ? JSON.parse(task.subtasks) : []; } catch { task.subtasks = []; } task.done = !!task.done; task.starred = !!task.starred; }
     res.json(task);
   } catch (e) {
     console.error('Task create error:', e.stack);
@@ -387,11 +390,12 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
     const task = await getOne('SELECT * FROM tasks WHERE id = $1 AND userid = $2', [id, req.user.id]);
     if (!task) return res.status(404).json({ error: 'Gorev bulunamadi' });
 
-    const { text, done, priority, dueDate, category, tags } = req.body || {};
+    const { text, done, priority, dueDate, category, tags, starred, recurring, subtasks } = req.body || {};
     if (text !== undefined && text.trim().length > 500) return res.status(400).json({ error: 'Gorev metni en fazla 500 karakter' });
     if (priority && !['low', 'medium', 'high'].includes(priority)) return res.status(400).json({ error: 'Gecersiz oncelik' });
+    if (recurring && !['daily', 'weekly', 'monthly'].includes(recurring)) return res.status(400).json({ error: 'Gecersiz tekrar' });
 
-    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, updatedat = NOW()::text WHERE id = $7',
+    await run('UPDATE tasks SET text = $1, done = $2, priority = $3, duedate = $4, category = $5, tags = $6, starred = $7, recurring = $8, subtasks = $9, updatedat = NOW()::text WHERE id = $10',
       [
         text !== undefined ? text.trim() : task.text,
         done !== undefined ? (done ? true : false) : task.done,
@@ -399,11 +403,14 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
         dueDate !== undefined ? dueDate : task.duedate,
         category !== undefined ? category : task.category,
         tags !== undefined ? JSON.stringify(tags) : task.tags,
+        starred !== undefined ? !!starred : !!task.starred,
+        recurring !== undefined ? recurring : task.recurring,
+        subtasks !== undefined ? JSON.stringify(subtasks) : task.subtasks,
         id
       ]);
 
     const updated = await getOne('SELECT * FROM tasks WHERE id = $1', [id]);
-    if (updated) { try { updated.tags = updated.tags ? JSON.parse(updated.tags) : []; } catch { updated.tags = []; } updated.done = !!updated.done; }
+    if (updated) { try { updated.tags = updated.tags ? JSON.parse(updated.tags) : []; } catch { updated.tags = []; } try { updated.subtasks = updated.subtasks ? JSON.parse(updated.subtasks) : []; } catch { updated.subtasks = []; } updated.done = !!updated.done; updated.starred = !!updated.starred; }
     res.json(updated);
   } catch (e) {
     console.error('Task update error:', e.stack);
@@ -541,6 +548,134 @@ app.delete('/api/admin/users/:id', auth, adminOnly, async (req, res) => {
   }
 });
 
+// ── Categories Routes ───────────────────────────────────
+app.get('/api/categories', auth, async (req, res) => {
+  try {
+    const cats = await getAll('SELECT * FROM categories WHERE userid = $1 ORDER BY itemorder ASC', [req.user.id]);
+    res.json(cats);
+  } catch (e) {
+    console.error('Categories error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+app.post('/api/categories', auth, async (req, res) => {
+  try {
+    const { name, color } = req.body || {};
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Kategori adi gerekli' });
+    if (name.trim().length > 30) return res.status(400).json({ error: 'Kategori adi en fazla 30 karakter' });
+    if (rateLimit('cat:' + req.user.id, 30, 60000)) return res.status(429).json({ error: 'Cok fazla istek' });
+
+    const maxOrder = await getOne('SELECT COALESCE(MAX(itemorder), 0) AS mx FROM categories WHERE userid = $1', [req.user.id]);
+    const order = (maxOrder.mx || 0) + 1;
+
+    const result = await run(
+      'INSERT INTO categories (userid, name, color, itemorder, createdat) VALUES ($1, $2, $3, $4, NOW()::text) RETURNING *',
+      [req.user.id, name.trim(), color || '#7c5cff', order]
+    );
+    res.json(result.rows[0]);
+  } catch (e) {
+    console.error('Category create error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+app.put('/api/categories/:id', auth, async (req, res) => {
+  try {
+    const { name, color } = req.body || {};
+    const cat = await getOne('SELECT * FROM categories WHERE id = $1 AND userid = $2', [req.params.id, req.user.id]);
+    if (!cat) return res.status(404).json({ error: 'Kategori bulunamadi' });
+    await run('UPDATE categories SET name = $1, color = $2 WHERE id = $3',
+      [name || cat.name, color || cat.color, req.params.id]);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Category update error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+app.delete('/api/categories/:id', auth, async (req, res) => {
+  try {
+    const cat = await getOne('SELECT * FROM categories WHERE id = $1 AND userid = $2', [req.params.id, req.user.id]);
+    if (!cat) return res.status(404).json({ error: 'Kategori bulunamadi' });
+    await run('DELETE FROM categories WHERE id = $1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Category delete error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+// ── Stats Routes ────────────────────────────────────────
+app.get('/api/stats/weekly', auth, async (req, res) => {
+  try {
+    const rows = await getAll(`
+      SELECT EXTRACT(DOW FROM updatedat::timestamp)::int as day, COUNT(*)::int as count
+      FROM tasks
+      WHERE userid = $1 AND done = true
+        AND updatedat::timestamp >= date_trunc('week', NOW())
+      GROUP BY day ORDER BY day
+    `, [req.user.id]);
+    const weekStats = [0, 0, 0, 0, 0, 0, 0];
+    rows.forEach(r => { weekStats[r.day] = r.count; });
+    const total = weekStats.reduce((a, b) => a + b, 0);
+    res.json({ weekStats, total });
+  } catch (e) {
+    console.error('Weekly stats error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+// ── Star Toggle ─────────────────────────────────────────
+app.put('/api/tasks/:id/star', auth, async (req, res) => {
+  try {
+    const task = await getOne('SELECT * FROM tasks WHERE id = $1 AND userid = $2', [req.params.id, req.user.id]);
+    if (!task) return res.status(404).json({ error: 'Gorev bulunamadi' });
+    const newStarred = !task.starred;
+    await run('UPDATE tasks SET starred = $1, updatedat = NOW()::text WHERE id = $2', [newStarred, req.params.id]);
+    const updated = await getOne('SELECT * FROM tasks WHERE id = $1', [req.params.id]);
+    if (updated) { try { updated.tags = updated.tags ? JSON.parse(updated.tags) : []; } catch { updated.tags = []; } try { updated.subtasks = updated.subtasks ? JSON.parse(updated.subtasks) : []; } catch { updated.subtasks = []; } updated.done = !!updated.done; updated.starred = !!updated.starred; }
+    res.json(updated);
+  } catch (e) {
+    console.error('Star toggle error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+// ── User Profile / Gamification ─────────────────────────
+app.get('/api/user/profile', auth, async (req, res) => {
+  try {
+    const user = await getOne('SELECT id, username, xp, level, streak, lastcompletiondate, dailygoal, weeklygoal FROM users WHERE id = $1', [req.user.id]);
+    res.json(user);
+  } catch (e) {
+    console.error('Profile error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
+app.put('/api/user/profile', auth, async (req, res) => {
+  try {
+    const { xp, level, streak, lastcompletiondate, dailygoal, weeklygoal } = req.body || {};
+    const updates = [];
+    const params = [];
+    let idx = 1;
+    if (xp !== undefined) { updates.push(`xp = $${idx++}`); params.push(xp); }
+    if (level !== undefined) { updates.push(`level = $${idx++}`); params.push(level); }
+    if (streak !== undefined) { updates.push(`streak = $${idx++}`); params.push(streak); }
+    if (lastcompletiondate !== undefined) { updates.push(`lastcompletiondate = $${idx++}`); params.push(lastcompletiondate); }
+    if (dailygoal !== undefined) { updates.push(`dailygoal = $${idx++}`); params.push(dailygoal); }
+    if (weeklygoal !== undefined) { updates.push(`weeklygoal = $${idx++}`); params.push(weeklygoal); }
+    if (updates.length) {
+      params.push(req.user.id);
+      await run('UPDATE users SET ' + updates.join(', ') + ` WHERE id = $${idx}`, params);
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Profile update error:', e.stack);
+    res.status(500).json({ error: 'Sunucu hatasi' });
+  }
+});
+
 // ── Error Handlers ──────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Bulunamadi' }));
 app.use((err, req, res, next) => { console.error('Unhandled:', err.stack || err.message); res.status(500).json({ error: 'Sunucu hatasi' }); });
@@ -587,6 +722,32 @@ app.use((err, req, res, next) => { console.error('Unhandled:', err.stack || err.
   await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false');
   await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verificationToken TEXT');
   await pool.query('UPDATE users SET verified = true WHERE role = $1', ['admin']);
+
+  // Gamification columns
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS lastcompletiondate TEXT');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS dailygoal INTEGER DEFAULT 5');
+  await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS weeklygoal INTEGER DEFAULT 25');
+
+  // Task extensions
+  await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS starred BOOLEAN DEFAULT false');
+  await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS recurring TEXT');
+  await pool.query("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS subtasks TEXT DEFAULT '[]'");
+
+  // Categories table
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      userid INTEGER NOT NULL REFERENCES users(id),
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#7c5cff',
+      itemorder INTEGER DEFAULT 0,
+      createdat TEXT DEFAULT NOW()::text
+    )
+  `);
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_categories_user ON categories(userid)');
 
   app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 })();

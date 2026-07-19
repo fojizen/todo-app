@@ -698,6 +698,151 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 @media print {
   body { background: #fff !important; color: #000 !important; }
   .task-item { break-inside: avoid; border: 1px solid #ccc !important; }
-  nav, .btn, .btn-icon, .theme-toggle, .toast-container, .modal, canvas, #particleCanvas { display: none !important; }
+  nav, .btn, .btn-icon, .theme-toggle, .toast-container, .modal, canvas, #particleCanvas, .app-sidebar { display: none !important; }
   .task-list { max-height: none !important; overflow: visible !important; }
 }
+
+/* ═══════════════════════════════════════
+   APP LAYOUT
+   ═══════════════════════════════════════ */
+.app-layout{display:flex;flex:1;position:relative;overflow:hidden}
+.app-main{flex:1;min-width:0}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════ */
+.app-sidebar{width:272px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg2);overflow-y:auto;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);position:relative;z-index:40}
+.app-sidebar::-webkit-scrollbar{width:4px}
+.app-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sidebar-inner{display:flex;flex-direction:column;gap:0;padding:16px 0;padding-top:calc(16px + var(--safe-top));padding-bottom:calc(16px + var(--safe-bottom));flex:1}
+.sidebar-mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:39;opacity:0;transition:opacity .3s}
+.sidebar-mobile-overlay.open{display:block;opacity:1}
+
+/* Sidebar Toggle */
+.sidebar-toggle-btn{display:none}
+
+/* Sidebar Sections */
+.sb-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.sb-section:last-child{border-bottom:none}
+.sb-section-title{font-size:.6875rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+
+/* Gamification Bar */
+.sb-gamification{padding:16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(124,92,255,.06),rgba(6,182,212,.04))}
+.sb-level-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sb-level-badge{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.875rem;font-weight:800;flex-shrink:0;box-shadow:0 2px 12px rgba(124,92,255,.3)}
+.sb-level-info{flex:1;min-width:0}
+.sb-level-label{font-size:.75rem;font-weight:600;color:var(--text2);display:block;margin-bottom:4px}
+.sb-xp-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sb-xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.sb-xp-text{font-size:.6875rem;font-weight:700;color:var(--accent);white-space:nowrap}
+.sb-streak-row{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--orange);font-weight:600}
+.sb-streak-row svg{stroke:var(--orange)}
+
+/* Quick Filters */
+.sb-filter-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-family:inherit;font-size:.8125rem;font-weight:500;cursor:pointer;transition:all .15s;text-align:left;-webkit-tap-highlight-color:transparent}
+.sb-filter-btn:hover{background:var(--bg3);color:var(--text)}
+.sb-filter-btn.active{background:rgba(124,92,255,.1);color:var(--accent);font-weight:600}
+.sb-filter-btn svg{flex-shrink:0;opacity:.7}
+.sb-filter-btn.active svg{opacity:1;stroke:var(--accent)}
+.sb-count{margin-left:auto;font-size:.6875rem;font-weight:700;background:var(--bg3);padding:1px 7px;border-radius:999px;color:var(--text2);min-width:20px;text-align:center}
+.sb-filter-btn.active .sb-count{background:rgba(124,92,255,.15);color:var(--accent)}
+.sb-count-warn{background:rgba(239,68,68,.1)!important;color:var(--red)!important}
+
+/* Categories */
+.sb-cat-item{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-size:.8125rem;color:var(--text2);position:relative}
+.sb-cat-item:hover{background:var(--bg3);color:var(--text)}
+.sb-cat-item.active{background:rgba(124,92,255,.1);color:var(--accent)}
+.sb-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sb-cat-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.sb-cat-count{font-size:.6875rem;font-weight:700;color:var(--muted);min-width:16px;text-align:center}
+.sb-cat-item.active .sb-cat-count{color:var(--accent)}
+.sb-cat-del{display:none;width:18px;height:18px;border:none;border-radius:4px;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.sb-cat-item:hover .sb-cat-del{display:flex}
+.sb-cat-del:hover{background:rgba(239,68,68,.15);color:var(--red)}
+.sb-add-category{display:flex;align-items:center;gap:8px;width:100%;padding:7px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:.8125rem;font-weight:500;cursor:pointer;transition:all .15s;margin-top:4px}
+.sb-add-category:hover{color:var(--accent);background:rgba(124,92,255,.06)}
+
+/* Pomodoro */
+.sb-pomodoro{background:linear-gradient(135deg,rgba(239,68,68,.04),rgba(245,158,11,.04))}
+.pomo-display{text-align:center;margin-bottom:8px}
+.pomo-time{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);letter-spacing:.02em;display:block}
+.pomo-label{font-size:.75rem;color:var(--muted);font-weight:500}
+.pomo-task-name{font-size:.75rem;color:var(--accent);text-align:center;margin-bottom:8px;padding:4px 8px;background:rgba(124,92,255,.08);border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pomo-controls{display:flex;gap:8px;justify-content:center}
+.pomo-btn{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;font-size:.8125rem;font-weight:600;cursor:pointer;transition:all .15s}
+.pomo-btn:hover{border-color:var(--border2);background:var(--card-h)}
+.pomo-start{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pomo-start:hover{filter:brightness(1.15)}
+
+/* Weekly Stats */
+.weekly-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding:8px 0}
+.wc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.wc-bar{width:100%;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;transition:height .5s cubic-bezier(.4,0,.2,1);min-height:2px;opacity:.7}
+.wc-bar-wrap.today .wc-bar{opacity:1;box-shadow:0 0 8px rgba(124,92,255,.3)}
+.wc-day{font-size:.625rem;color:var(--muted);font-weight:600}
+.wc-bar-wrap.today .wc-day{color:var(--accent)}
+.weekly-msg{font-size:.75rem;color:var(--text2);text-align:center;margin-top:6px;line-height:1.4}
+
+/* Daily Goal */
+.sb-goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sb-goal-header span:first-child{font-size:.75rem;font-weight:600;color:var(--text2)}
+.sb-goal-count{font-size:.6875rem;font-weight:700;color:var(--accent)}
+.sb-goal-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sb-goal-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* Settings */
+.sb-settings-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-family:inherit;font-size:.8125rem;font-weight:500;cursor:pointer;transition:all .15s;text-align:left}
+.sb-settings-btn:hover{background:var(--bg3);color:var(--text)}
+
+/* ═══════════════════════════════════════
+   TASK BADGES (New)
+   ═══════════════════════════════════════ */
+.badge-recurring{background:rgba(168,85,247,.1);color:var(--accent2)}
+.badge-subtasks{background:rgba(6,182,212,.1);color:var(--cyan);font-variant-numeric:tabular-nums}
+
+/* Star Button */
+.act-btn.star{color:var(--muted)}
+.act-btn.star:hover{background:rgba(245,158,11,.12);color:var(--orange)}
+.act-btn.star.starred{color:var(--orange)}
+.act-btn.star.starred:hover{background:rgba(245,158,11,.15)}
+
+/* ═══════════════════════════════════════
+   SUBTASKS
+   ═══════════════════════════════════════ */
+.subtask-section{margin-top:8px;padding:0 2px}
+.subtask-list{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.subtask-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;transition:background .15s;font-size:.8125rem}
+.subtask-item:hover{background:var(--bg3)}
+.subtask-item.done .subtask-text{text-decoration:line-through;color:var(--muted)}
+.subtask-check{transform:scale(.85)}
+.subtask-text{flex:1;color:var(--text)}
+.subtask-del{display:none;width:18px;height:18px;border:none;border-radius:4px;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;align-items:center;justify-content:center;line-height:1}
+.subtask-item:hover .subtask-del{display:flex}
+.subtask-del:hover{color:var(--red);background:rgba(239,68,68,.1)}
+.subtask-input-row{display:flex;gap:6px;align-items:center}
+.subtask-input-row input{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--input);color:var(--text);font-size:.8125rem;transition:border-color var(--tr)}
+.subtask-input-row input:focus{outline:none;border-color:var(--accent)}
+.edit-subtask-list{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+
+/* ═══════════════════════════════════════
+   CONFETTI CANVAS
+   ═══════════════════════════════════════ */
+.confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99998;display:none}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE (Sidebar)
+   ═══════════════════════════════════════ */
+@media(max-width:900px){
+  .sidebar-toggle-btn{display:flex!important}
+  .app-sidebar{position:fixed;top:0;left:0;bottom:0;z-index:41;transform:translateX(-100%);box-shadow:none}
+  .app-sidebar.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.4)}
+}
+@media(min-width:901px){
+  .app-sidebar{transform:none!important}
+}
+
+/* ═══════════════════════════════════════
+   TASK ITEM COMPACT (with sidebar)
+   ═══════════════════════════════════════ */
+.task-item .task-meta{gap:4px}
+.task-badge{font-size:.65rem;padding:2px 7px}

@@ -561,6 +561,9 @@
     </div>
     <header class="app-header">
       <div class="header-left">
+        <button id="sidebarToggle" class="btn-icon sidebar-toggle-btn" aria-label="Menu" title="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <button id="homeBtn" class="btn btn-ghost btn-sm" title="Anasayfa">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span data-lang-key="nav.home">Anasayfa</span>
@@ -584,6 +587,118 @@
         </button>
       </div>
     </header>
+
+    <div class="app-layout">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-inner">
+
+        <!-- Gamification Bar -->
+        <div class="sb-gamification" id="sbGamification">
+          <div class="sb-level-row">
+            <div class="sb-level-badge" id="sbLevelBadge">1</div>
+            <div class="sb-level-info">
+              <span class="sb-level-label" data-lang-key="sb.level">Seviye</span>
+              <div class="sb-xp-bar"><div class="sb-xp-fill" id="sbXpFill" style="width:0%"></div></div>
+            </div>
+            <span class="sb-xp-text" id="sbXpText">0 XP</span>
+          </div>
+          <div class="sb-streak-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span id="sbStreakCount">0</span>
+            <span data-lang-key="sb.streak">gun seri</span>
+          </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="sb-section">
+          <div class="sb-section-title" data-lang-key="sb.quickFilters">Hizli Filtreler</div>
+          <button class="sb-filter-btn active" data-filter="all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <span data-lang-key="sb.allTasks">Tum Gorevler</span>
+            <span class="sb-count" id="sbCountAll">0</span>
+          </button>
+          <button class="sb-filter-btn" data-filter="today">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span data-lang-key="sb.today">Bugun</span>
+            <span class="sb-count" id="sbCountToday">0</span>
+          </button>
+          <button class="sb-filter-btn" data-filter="week">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span data-lang-key="sb.thisWeek">Bu Hafta</span>
+            <span class="sb-count" id="sbCountWeek">0</span>
+          </button>
+          <button class="sb-filter-btn" data-filter="overdue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span data-lang-key="sb.overdue">Gecikmis</span>
+            <span class="sb-count sb-count-warn" id="sbCountOverdue">0</span>
+          </button>
+          <button class="sb-filter-btn" data-filter="starred">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span data-lang-key="sb.starred">Yildizli</span>
+            <span class="sb-count" id="sbCountStarred">0</span>
+          </button>
+        </div>
+
+        <!-- Categories -->
+        <div class="sb-section">
+          <div class="sb-section-title" data-lang-key="sb.categories">Kategoriler</div>
+          <div id="sbCategoryList"></div>
+          <button class="sb-add-category" id="sbAddCategory">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span data-lang-key="sb.addCategory">Kategori Ekle</span>
+          </button>
+        </div>
+
+        <!-- Focus Timer -->
+        <div class="sb-section sb-pomodoro">
+          <div class="sb-section-title" data-lang-key="sb.focus">Odaklanma</div>
+          <div class="pomo-display">
+            <span class="pomo-time" id="pomoTime">25:00</span>
+            <span class="pomo-label" id="pomoLabel" data-lang-key="sb.pomo.ready">Hazir</span>
+          </div>
+          <div class="pomo-task-name" id="pomoTaskName" style="display:none"></div>
+          <div class="pomo-controls">
+            <button class="pomo-btn pomo-start" id="pomoStart" data-lang-key="sb.pomo.start">Baslat</button>
+            <button class="pomo-btn pomo-reset" id="pomoReset" data-lang-key="sb.pomo.reset">Sifirla</button>
+          </div>
+        </div>
+
+        <!-- Weekly Stats -->
+        <div class="sb-section sb-weekly">
+          <div class="sb-section-title" data-lang-key="sb.weeklyStats">Haftalik Istatistik</div>
+          <div class="weekly-chart" id="weeklyChart">
+            <div class="wc-bar-wrap" data-day="0"><div class="wc-bar" style="height:0%"></div><span class="wc-day">P</span></div>
+            <div class="wc-bar-wrap" data-day="1"><div class="wc-bar" style="height:0%"></div><span class="wc-day">S</span></div>
+            <div class="wc-bar-wrap" data-day="2"><div class="wc-bar" style="height:0%"></div><span class="wc-day">C</span></div>
+            <div class="wc-bar-wrap" data-day="3"><div class="wc-bar" style="height:0%"></div><span class="wc-day">P</span></div>
+            <div class="wc-bar-wrap" data-day="4"><div class="wc-bar" style="height:0%"></div><span class="wc-day">C</span></div>
+            <div class="wc-bar-wrap" data-day="5"><div class="wc-bar" style="height:0%"></div><span class="wc-day">C</span></div>
+            <div class="wc-bar-wrap" data-day="6"><div class="wc-bar" style="height:0%"></div><span class="wc-day">P</span></div>
+          </div>
+          <div class="weekly-msg" id="weeklyMsg"></div>
+        </div>
+
+        <!-- Daily Goal -->
+        <div class="sb-section sb-goal">
+          <div class="sb-goal-header">
+            <span data-lang-key="sb.dailyGoal">Gunluk Hedef</span>
+            <span class="sb-goal-count" id="sbGoalCount">0/5</span>
+          </div>
+          <div class="sb-goal-bar"><div class="sb-goal-fill" id="sbGoalFill" style="width:0%"></div></div>
+        </div>
+
+        <!-- Settings -->
+        <div class="sb-section sb-settings">
+          <button class="sb-settings-btn" id="sbThemeToggle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span data-lang-key="sb.settings">Ayarlar</span>
+          </button>
+        </div>
+
+      </div>
+    </aside>
+    <div class="sidebar-mobile-overlay" id="sidebarMobileOverlay"></div>
 
     <main class="app-main">
       <form id="taskForm" class="task-form">
@@ -632,7 +747,30 @@
               <input type="text" id="taskTags" data-lang-placeholder="main.task.tags.ph" placeholder="etiket1, etiket2">
             </div>
           </div>
+          <div class="extra-field">
+            <label data-lang-key="main.task.recurring">Tekrar</label>
+            <div class="custom-select-wrap">
+              <select id="taskRecurring">
+                <option value="" data-lang-key="recurring.none">Yok</option>
+                <option value="daily" data-lang-key="recurring.daily">Her Gun</option>
+                <option value="weekly" data-lang-key="recurring.weekly">Her Hafta</option>
+                <option value="monthly" data-lang-key="recurring.monthly">Her Ay</option>
+              </select>
+            </div>
+          </div>
         </div>
+
+        <!-- Subtasks -->
+        <div class="subtask-section" id="subtaskSection">
+          <div class="subtask-list" id="subtaskList"></div>
+          <div class="subtask-input-row">
+            <input type="text" id="subtaskInput" data-lang-placeholder="main.task.subtask.ph" placeholder="Alt gorev ekle..." autocomplete="off">
+            <button type="button" class="btn btn-ghost btn-sm" id="addSubtaskBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+
         <button type="button" class="btn-ghost btn-toggle-extras" id="toggleExtras">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           <span data-lang-key="main.task.advanced">Gelismis secenekler</span>
@@ -670,6 +808,8 @@
         <button id="clearDoneBtn" class="btn btn-ghost btn-sm" data-lang-key="stats.clear">Tamamlananlari Sil</button>
       </footer>
     </main>
+    </div><!-- /app-layout -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
     <div class="page-footer">
       <div class="page-footer-links">
         <a href="https://github.com/fojizen" target="_blank" rel="noopener" aria-label="GitHub">
@@ -753,6 +893,28 @@
           <div class="form-group"><label data-lang-key="edit.tags">Etiketler</label><div class="custom-input-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg><input type="text" id="editTags" data-lang-placeholder="main.task.tags.ph" placeholder="etiket1, etiket2"></div></div>
         </div>
         <div class="form-check"><input type="checkbox" id="editDone"><label for="editDone" data-lang-key="edit.done">Tamamlandi</label></div>
+        <div class="form-check"><input type="checkbox" id="editStarred"><label for="editStarred" data-lang-key="edit.starred">Yildizli</label></div>
+        <div class="form-group">
+          <label data-lang-key="edit.recurring">Tekrar</label>
+          <div class="custom-select-wrap">
+            <select id="editRecurring">
+              <option value="" data-lang-key="recurring.none">Yok</option>
+              <option value="daily" data-lang-key="recurring.daily">Her Gun</option>
+              <option value="weekly" data-lang-key="recurring.weekly">Her Hafta</option>
+              <option value="monthly" data-lang-key="recurring.monthly">Her Ay</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-lang-key="edit.subtasks">Alt Gorevler</label>
+          <div class="edit-subtask-list" id="editSubtaskList"></div>
+          <div class="subtask-input-row">
+            <input type="text" id="editSubtaskInput" data-lang-placeholder="main.task.subtask.ph" placeholder="Alt gorev ekle...">
+            <button type="button" class="btn btn-ghost btn-sm" id="editAddSubtaskBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
       </form>
       <div class="modal-foot">
         <button id="editDeleteBtn" class="btn btn-danger" data-lang-key="edit.delete">Sil</button>

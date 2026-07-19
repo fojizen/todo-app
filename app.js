@@ -19,10 +19,15 @@
   var currentUser = null;
   var currentRole = null;
   var todos = [];
-  var filter = { status: 'all', priority: 'all', category: 'all', search: '' };
+  var categories = [];
+  var filter = { status: 'all', priority: 'all', category: 'all', search: '', quickFilter: 'all' };
   var sort = { field: 'order', dir: 'asc' };
   var editingId = null;
   var transitioning = false;
+  var userProfile = { xp: 0, level: 1, streak: 0, lastcompletiondate: null, dailygoal: 5, weeklygoal: 25 };
+  var pendingSubtasks = [];
+  var editingSubtasks = [];
+  var pomoState = { running: false, paused: false, seconds: 25 * 60, interval: null, taskId: null };
 
   /* ── i18n ── */
   var currentLang = localStorage.getItem('lang') || 'tr';
@@ -125,7 +130,23 @@
       'err.available':' musait','err.taken':' zaten alinmis','err.checking':'Kontrol ediliyor...',
       'admin.badge.admin':'Admin','admin.badge.user':'User','admin.status.active':'Aktif','admin.status.banned':'Banli',
       'admin.btn.edit':'Duzenle','admin.btn.unban':'Ban kaldir','admin.btn.ban':'Banla','admin.btn.del':'Sil',
-      'admin.usersLoadErr':'Kullanicialar yuklenemedi'
+      'admin.usersLoadErr':'Kullanicialar yuklenemedi',
+      'sb.level':'Seviye','sb.streak':'gun seri','sb.quickFilters':'Hizli Filtreler',
+      'sb.allTasks':'Tum Gorevler','sb.today':'Bugun','sb.thisWeek':'Bu Hafta','sb.overdue':'Gecikmis','sb.starred':'Yildizli',
+      'sb.categories':'Kategoriler','sb.addCategory':'Kategori Ekle','sb.catName':'Kategori adi',
+      'sb.focus':'Odaklanma','sb.pomo.ready':'Hazir','sb.pomo.running':'Devam ediyor','sb.pomo.break':'Mola',
+      'sb.pomo.start':'Baslat','sb.pomo.pause':'Duraklat','sb.pomo.reset':'Sifirla','sb.pomo.done':'Mola zamanı!',
+      'sb.weeklyStats':'Haftalik Istatistik','sb.weeklyMsg':'Bu hafta {n} gorev tamamladin {emoji}',
+      'sb.dailyGoal':'Gunluk Hedef','sb.settings':'Ayarlar',
+      'recurring.none':'Yok','recurring.daily':'Her Gun','recurring.weekly':'Her Hafta','recurring.monthly':'Her Ay',
+      'main.task.recurring':'Tekrar','main.task.subtask.ph':'Alt gorev ekle...',
+      'edit.recurring':'Tekrar','edit.subtasks':'Alt Gorevler','edit.starred':'Yildizli',
+      'subtask.done':'Tamamlandi','cat.default.work':'Is','cat.default.personal':'Kisisel',
+      'cat.default.shopping':'Alisveris','cat.default.health':'Saglik','cat.default.education':'Egitim',
+      'toast.catAdded':'Kategori eklendi','toast.catDeleted':'Kategori silindi',
+      'toast.levelUp':'Seviye {n} oldun!','toast.streak':'Seri devam ediyor!',
+      'toast.pomoDone':'Odaklanma bitti! 5 dakika mola.','toast.xpGain':'+{n} XP',
+      'toast.goalReached':'Gunluk hedefe ulastin!','confirm.deleteCat':'Bu kategoriyi silmek istediginize emin misiniz?'
     },
     en: {
       'nav.features':'Features','nav.how':'How It Works','nav.tech':'Tech',
@@ -224,7 +245,23 @@
       'err.available':' is available','err.taken':' is already taken','err.checking':'Checking...',
       'admin.badge.admin':'Admin','admin.badge.user':'User','admin.status.active':'Active','admin.status.banned':'Banned',
       'admin.btn.edit':'Edit','admin.btn.unban':'Unban','admin.btn.ban':'Ban','admin.btn.del':'Delete',
-      'admin.usersLoadErr':'Could not load users'
+      'admin.usersLoadErr':'Could not load users',
+      'sb.level':'Level','sb.streak':'day streak','sb.quickFilters':'Quick Filters',
+      'sb.allTasks':'All Tasks','sb.today':'Today','sb.thisWeek':'This Week','sb.overdue':'Overdue','sb.starred':'Starred',
+      'sb.categories':'Categories','sb.addCategory':'Add Category','sb.catName':'Category name',
+      'sb.focus':'Focus Timer','sb.pomo.ready':'Ready','sb.pomo.running':'Running','sb.pomo.break':'Break',
+      'sb.pomo.start':'Start','sb.pomo.pause':'Pause','sb.pomo.reset':'Reset','sb.pomo.done':'Break time!',
+      'sb.weeklyStats':'Weekly Stats','sb.weeklyMsg':'You completed {n} tasks this week {emoji}',
+      'sb.dailyGoal':'Daily Goal','sb.settings':'Settings',
+      'recurring.none':'None','recurring.daily':'Daily','recurring.weekly':'Weekly','recurring.monthly':'Monthly',
+      'main.task.recurring':'Repeat','main.task.subtask.ph':'Add subtask...',
+      'edit.recurring':'Repeat','edit.subtasks':'Subtasks','edit.starred':'Starred',
+      'subtask.done':'Done','cat.default.work':'Work','cat.default.personal':'Personal',
+      'cat.default.shopping':'Shopping','cat.default.health':'Health','cat.default.education':'Education',
+      'toast.catAdded':'Category added','toast.catDeleted':'Category deleted',
+      'toast.levelUp':'You reached Level {n}!','toast.streak':'Streak continues!',
+      'toast.pomoDone':'Focus session done! Take a 5-min break.','toast.xpGain':'+{n} XP',
+      'toast.goalReached':'Daily goal reached!','confirm.deleteCat':'Delete this category?'
     }
   };
 
@@ -237,7 +274,9 @@
     'edit.category':[{value:'',tr:'Yok',en:'None'},{value:'Is',tr:'Is',en:'Work'},{value:'Kisisel',tr:'Kisisel',en:'Personal'},{value:'Alisveris',tr:'Alisveris',en:'Shopping'},{value:'Saglik',tr:'Saglik',en:'Health'},{value:'Egitim',tr:'Egitim',en:'Education'}],
     'sort.select':[{value:'order-asc',tr:'Siralama',en:'Sort'},{value:'createdAt-desc',tr:'En Yeni',en:'Newest'},{value:'createdAt-asc',tr:'En Eski',en:'Oldest'},{value:'priority-desc',tr:'Oncelik',en:'Priority'},{value:'dueDate-asc',tr:'Bitis Tarihi',en:'Due Date'}],
     'adminEdit.role':[{value:'user',tr:'User',en:'User'},{value:'admin',tr:'Admin',en:'Admin'}],
-    'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}]
+    'adminEdit.status':[{value:'0',tr:'Aktif',en:'Active'},{value:'1',tr:'Banli',en:'Banned'}],
+    'task.recurring':[{value:'',tr:'Yok',en:'None'},{value:'daily',tr:'Her Gun',en:'Daily'},{value:'weekly',tr:'Her Hafta',en:'Weekly'},{value:'monthly',tr:'Her Ay',en:'Monthly'}],
+    'edit.recurring':[{value:'',tr:'Yok',en:'None'},{value:'daily',tr:'Her Gun',en:'Daily'},{value:'weekly',tr:'Her Hafta',en:'Weekly'},{value:'monthly',tr:'Her Ay',en:'Monthly'}]
   };
 
   var HTML_KEYS = {'hero.title':1,'hero.sub':1,'feat.title':1,'how.title':1,'tech.title':1,'cta.title':1,'about.title':1,'privacy.title':1,'privacy.content':1,'privacy.1':1,'privacy.2':1,'privacy.3':1,'privacy.4':1,'privacy.5':1,'privacy.6':1,'footer.contact':1,'footer.copyright':1,'verify.title':1,'verify.desc':1,'verify.close':1};
@@ -564,9 +603,11 @@
     if (welcomeEl) welcomeEl.textContent = t('welcome.prefix') + ' ' + currentUser + '!';
     showAdminBtn();
     showLoader();
-    loadTasks().then(function () {
+    initSidebar();
+    Promise.all([loadTasks(), loadCategories(), loadUserProfile(), loadWeeklyStats()]).then(function () {
       showPage('mainPage', true);
       render();
+      updateDailyGoal();
     }).catch(function (err) {
       hideLoader();
       if (err.message === 'Internet baglantisi yok') {
@@ -1050,6 +1091,27 @@
     else if (filter.status === 'completed') list = list.filter(function (x) { return x.done; });
     if (filter.priority !== 'all') list = list.filter(function (x) { return x.priority === filter.priority; });
     if (filter.category !== 'all') list = list.filter(function (x) { return x.category === filter.category; });
+    if (filter.quickFilter === 'today') {
+      var today = new Date(); today.setHours(0,0,0,0);
+      list = list.filter(function(x) {
+        if (!x.dueDate) return false;
+        var d = new Date(x.dueDate); d.setHours(0,0,0,0);
+        return d.getTime() === today.getTime();
+      });
+    } else if (filter.quickFilter === 'week') {
+      var now = new Date(); now.setHours(0,0,0,0);
+      var ws = new Date(now); ws.setDate(ws.getDate() - ws.getDay() + 1);
+      var we = new Date(ws); we.setDate(we.getDate() + 6);
+      list = list.filter(function(x) {
+        if (!x.dueDate) return false;
+        var d = new Date(x.dueDate); d.setHours(0,0,0,0);
+        return d >= ws && d <= we;
+      });
+    } else if (filter.quickFilter === 'overdue') {
+      list = list.filter(function(x) { return !x.done && isOverdue(x.dueDate); });
+    } else if (filter.quickFilter === 'starred') {
+      list = list.filter(function(x) { return x.starred; });
+    }
     if (filter.search) {
       var q = filter.search.toLowerCase();
       list = list.filter(function (x) {
@@ -1088,6 +1150,9 @@
       var ds = isDueSoon(task.dueDate) && !task.done && !od;
       var pc = PRI_COLORS[task.priority] || '#888';
       var pl = PRI_LABELS[task.priority] || task.priority;
+      var subtasks = task.subtasks || [];
+      var subDone = subtasks.filter(function(s) { return s.done; }).length;
+      var recurringIcons = { daily: '🔄', weekly: '📅', monthly: '📆' };
       return '<li class="task-item' + (task.done ? ' completed' : '') + (od ? ' overdue' : '') + (ds ? ' due-soon' : '') +
         '" data-id="' + task.id + '" draggable="true">' +
         '<div class="task-content"><label class="task-check"><input type="checkbox"' + (task.done ? ' checked' : '') + ' aria-label="' + esc(task.text) + '"><span class="checkmark"></span></label>' +
@@ -1095,9 +1160,12 @@
         (task.dueDate ? '<span class="task-badge badge-date' + (od ? ' overdue' : ds ? ' due-soon' : '') + '">' + fmtDate(task.dueDate) + '</span>' : '') +
         '<span class="task-badge badge-priority" style="background:' + pc + '15;color:' + pc + ';border-color:' + pc + '30">' + pl + '</span>' +
         (task.category ? '<span class="task-badge badge-category">' + esc(task.category) + '</span>' : '') +
+        (task.recurring ? '<span class="task-badge badge-recurring">' + (recurringIcons[task.recurring] || '') + ' ' + t('recurring.' + task.recurring) + '</span>' : '') +
         (task.tags || []).map(function (tg) { return '<span class="tag">' + esc(tg) + '</span>'; }).join('') +
+        (subtasks.length ? '<span class="task-badge badge-subtasks">' + subDone + '/' + subtasks.length + ' alt gorev</span>' : '') +
         '</div></div></div>' +
         '<div class="task-actions">' +
+        '<button class="act-btn star' + (task.starred ? ' starred' : '') + '" title="' + esc(t('edit.starred')) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="' + (task.starred ? '#f59e0b' : 'none') + '" stroke="' + (task.starred ? '#f59e0b' : 'currentColor') + '" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>' +
         '<button class="act-btn edit" title="' + esc(t('task.edit') || 'Edit') + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
         '<button class="act-btn del" title="' + esc(t('task.del') || 'Delete') + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>' +
         '</div></li>';
@@ -1106,6 +1174,9 @@
     bindTaskEvents();
     updateStats();
     updateCategoryFilter();
+    renderSidebarCounts();
+    renderSidebarCategories();
+    updateDailyGoal();
   }
 
   function bindTaskEvents() {
@@ -1113,6 +1184,18 @@
     if (!list) return;
 
     list.onclick = function (e) {
+      var starBtn = e.target.closest('.act-btn.star');
+      if (starBtn) {
+        var sItem = starBtn.closest('.task-item');
+        if (sItem) {
+          api('PUT', '/tasks/' + sItem.dataset.id + '/star').then(function(updated) {
+            var idx = todos.findIndex(function(x) { return String(x.id) === String(sItem.dataset.id); });
+            if (idx !== -1) todos[idx] = updated;
+            render();
+          }).catch(function() { showToast(t('toast.error'), 'error'); });
+        }
+        return;
+      }
       var editBtn = e.target.closest('.act-btn.edit');
       if (editBtn) { var item = editBtn.closest('.task-item'); if (item) openEditor(item.dataset.id); return; }
       var delBtn = e.target.closest('.act-btn.del');
@@ -1137,7 +1220,14 @@
       var task = todos.find(function (x) { return String(x.id) === String(id); });
       if (!task) return;
       task.done = !task.done;
-      api('PUT', '/tasks/' + id, { done: task.done }).then(function () { render(); })
+      api('PUT', '/tasks/' + id, { done: task.done }).then(function () {
+        if (task.done) {
+          awardXP(XP_PER_TASK);
+          updateStreak();
+          fireConfetti();
+        }
+        render(); updateDailyGoal(); loadWeeklyStats();
+      })
         .catch(function () { task.done = !task.done; render(); showToast(t('toast.updated'), 'error'); });
     };
 
@@ -1244,16 +1334,22 @@
     var text = inp.value.trim();
     if (!text) return;
     var tags = (document.getElementById('taskTags').value || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var recurring = document.getElementById('taskRecurring').value || null;
     api('POST', '/tasks', {
       text: text,
       priority: document.getElementById('taskPriority').value,
       dueDate: document.getElementById('taskDueDate').value || null,
       category: document.getElementById('taskCategory').value || '',
-      tags: tags
+      tags: tags,
+      recurring: recurring,
+      subtasks: pendingSubtasks.slice()
     }).then(function (task) {
       todos.push(task); inp.value = '';
       document.getElementById('taskTags').value = '';
       document.getElementById('taskDueDate').value = '';
+      pendingSubtasks = [];
+      var stList = document.getElementById('subtaskList');
+      if (stList) stList.innerHTML = '';
       render(); showToast(t('toast.taskAdd'), 'success');
     }).catch(function (err) { showToast(err.message || t('toast.noTask'), 'error'); });
   });
@@ -1320,17 +1416,360 @@
     sel.value = cur || 'all';
   }
 
+  /* ── Sidebar ── */
+  var sidebarEl, sidebarMobileOverlay;
+  function initSidebar() {
+    sidebarEl = document.getElementById('appSidebar');
+    sidebarMobileOverlay = document.getElementById('sidebarMobileOverlay');
+  }
+
+  function toggleSidebar() {
+    if (!sidebarEl) return;
+    var isOpen = sidebarEl.classList.contains('open');
+    sidebarEl.classList.toggle('open');
+    if (sidebarMobileOverlay) sidebarMobileOverlay.classList.toggle('open');
+  }
+
+  function closeSidebar() {
+    if (sidebarEl) sidebarEl.classList.remove('open');
+    if (sidebarMobileOverlay) sidebarMobileOverlay.classList.remove('open');
+  }
+
+  function renderSidebarCounts() {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
+    var weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
+    var all = todos.length;
+    var todayCount = todos.filter(function(x) {
+      if (!x.dueDate) return false;
+      var d = new Date(x.dueDate); d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    }).length;
+    var weekCount = todos.filter(function(x) {
+      if (!x.dueDate) return false;
+      var d = new Date(x.dueDate); d.setHours(0,0,0,0);
+      return d >= weekStart && d <= weekEnd;
+    }).length;
+    var overdue = todos.filter(function(x) { return !x.done && isOverdue(x.dueDate); }).length;
+    var starred = todos.filter(function(x) { return x.starred; }).length;
+    var el = function(id) { return document.getElementById(id); };
+    if (el('sbCountAll')) el('sbCountAll').textContent = all;
+    if (el('sbCountToday')) el('sbCountToday').textContent = todayCount;
+    if (el('sbCountWeek')) el('sbCountWeek').textContent = weekCount;
+    if (el('sbCountOverdue')) el('sbCountOverdue').textContent = overdue;
+    if (el('sbCountStarred')) el('sbCountStarred').textContent = starred;
+  }
+
+  function renderSidebarCategories() {
+    var list = document.getElementById('sbCategoryList');
+    if (!list) return;
+    list.innerHTML = categories.map(function(cat) {
+      var count = todos.filter(function(x) { return x.category === cat.name; }).length;
+      return '<div class="sb-cat-item' + (filter.category === cat.name ? ' active' : '') + '" data-name="' + esc(cat.name) + '">' +
+        '<span class="sb-cat-dot" style="background:' + esc(cat.color) + '"></span>' +
+        '<span class="sb-cat-name">' + esc(cat.name) + '</span>' +
+        '<span class="sb-cat-count">' + count + '</span>' +
+        '<button class="sb-cat-del" data-id="' + cat.id + '" title="Sil">&times;</button>' +
+      '</div>';
+    }).join('');
+    list.querySelectorAll('.sb-cat-item').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        if (e.target.closest('.sb-cat-del')) return;
+        var name = el.dataset.name;
+        filter.category = filter.category === name ? 'all' : name;
+        var sel = document.getElementById('filterCategory');
+        if (sel) sel.value = filter.category;
+        renderSidebarCategories();
+        render();
+      });
+    });
+    list.querySelectorAll('.sb-cat-del').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (confirm(t('confirm.deleteCat'))) {
+          api('DELETE', '/categories/' + btn.dataset.id).then(function() {
+            categories = categories.filter(function(c) { return String(c.id) !== String(btn.dataset.id); });
+            renderSidebarCategories();
+            showToast(t('toast.catDeleted'), 'info');
+          }).catch(function() { showToast(t('toast.error'), 'error'); });
+        }
+      });
+    });
+  }
+
+  function loadCategories() {
+    return api('GET', '/categories').then(function(data) { categories = data || []; renderSidebarCategories(); }).catch(function() { categories = []; });
+  }
+
+  /* ── Gamification ── */
+  var XP_PER_TASK = 10;
+  var XP_PER_SUBTASK = 5;
+  var XP_LEVEL_BASE = 100;
+
+  function calcLevel(xp) { return Math.floor(xp / XP_LEVEL_BASE) + 1; }
+  function calcLevelProgress(xp) { return (xp % XP_LEVEL_BASE); }
+
+  function loadUserProfile() {
+    return api('GET', '/user/profile').then(function(data) {
+      if (data) userProfile = data;
+      renderGamification();
+    }).catch(function() {});
+  }
+
+  function saveUserProfile(updates) {
+    Object.keys(updates).forEach(function(k) { userProfile[k] = updates[k]; });
+    renderGamification();
+    return api('PUT', '/user/profile', updates).catch(function() {});
+  }
+
+  function awardXP(amount) {
+    var newXp = (userProfile.xp || 0) + amount;
+    var oldLevel = userProfile.level || 1;
+    var newLevel = calcLevel(newXp);
+    saveUserProfile({ xp: newXp, level: newLevel });
+    showToast(t('toast.xpGain').replace('{n}', amount), 'success');
+    if (newLevel > oldLevel) {
+      setTimeout(function() { showToast(t('toast.levelUp').replace('{n}', newLevel), 'success'); }, 500);
+    }
+  }
+
+  function updateStreak() {
+    var today = new Date().toISOString().slice(0, 10);
+    var last = userProfile.lastcompletiondate;
+    if (last === today) return;
+    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = yesterday.toISOString().slice(0, 10);
+    var newStreak = (last === yesterdayStr) ? (userProfile.streak || 0) + 1 : 1;
+    saveUserProfile({ streak: newStreak, lastcompletiondate: today });
+    if (newStreak >= 3) showToast(t('toast.streak'), 'info');
+  }
+
+  function renderGamification() {
+    var level = userProfile.level || 1;
+    var xp = userProfile.xp || 0;
+    var streak = userProfile.streak || 0;
+    var progress = calcLevelProgress(xp);
+    var pct = Math.min(100, (progress / XP_LEVEL_BASE) * 100);
+    var el = function(id) { return document.getElementById(id); };
+    if (el('sbLevelBadge')) el('sbLevelBadge').textContent = level;
+    if (el('sbXpFill')) el('sbXpFill').style.width = pct + '%';
+    if (el('sbXpText')) el('sbXpText').textContent = xp + ' XP';
+    if (el('sbStreakCount')) el('sbStreakCount').textContent = streak;
+  }
+
+  function updateDailyGoal() {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var doneToday = todos.filter(function(x) {
+      if (!x.done) return false;
+      var d = new Date(x.updatedAt || x.createdAt); d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    }).length;
+    var goal = userProfile.dailygoal || 5;
+    var pct = Math.min(100, (doneToday / goal) * 100);
+    var el = function(id) { return document.getElementById(id); };
+    if (el('sbGoalCount')) el('sbGoalCount').textContent = doneToday + '/' + goal;
+    if (el('sbGoalFill')) el('sbGoalFill').style.width = pct + '%';
+  }
+
+  /* ── Weekly Stats ── */
+  function loadWeeklyStats() {
+    api('GET', '/stats/weekly').then(function(data) {
+      renderWeeklyStats(data);
+    }).catch(function() {});
+  }
+
+  function renderWeeklyStats(data) {
+    var chart = document.getElementById('weeklyChart');
+    if (!chart) return;
+    var bars = chart.querySelectorAll('.wc-bar-wrap');
+    var max = Math.max.apply(null, data.weekStats.concat([1]));
+    bars.forEach(function(wrap) {
+      var day = parseInt(wrap.dataset.day);
+      var val = data.weekStats[day] || 0;
+      var pct = (val / max) * 100;
+      var bar = wrap.querySelector('.wc-bar');
+      if (bar) { bar.style.height = pct + '%'; bar.title = val; }
+      var today = new Date().getDay();
+      if (day === today) wrap.classList.add('today');
+    });
+    var msg = document.getElementById('weeklyMsg');
+    if (msg) {
+      var emojis = ['💪', '🔥', '⭐', '🚀', '🎯', '✨'];
+      var emoji = data.total > 10 ? emojis[0] : data.total > 5 ? emojis[1] : data.total > 0 ? emojis[2] : '💪';
+      msg.textContent = t('sb.weeklyMsg').replace('{n}', data.total).replace('{emoji}', emoji);
+    }
+  }
+
+  /* ── Focus Timer (Pomodoro) ── */
+  function formatPomoTime(secs) {
+    var m = Math.floor(secs / 60);
+    var s = secs % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function pomoStart() {
+    if (pomoState.running && !pomoState.paused) {
+      clearInterval(pomoState.interval);
+      pomoState.paused = true;
+      var btn = document.getElementById('pomoStart');
+      if (btn) btn.textContent = t('sb.pomo.start');
+      var lbl = document.getElementById('pomoLabel');
+      if (lbl) lbl.textContent = 'Duraklatildi';
+      return;
+    }
+    if (pomoState.paused) {
+      pomoState.paused = false;
+      pomoState.running = true;
+      var btn2 = document.getElementById('pomoStart');
+      if (btn2) btn2.textContent = t('sb.pomo.pause');
+      var lbl2 = document.getElementById('pomoLabel');
+      if (lbl2) lbl2.textContent = t('sb.pomo.running');
+      pomoState.interval = setInterval(pomoTick, 1000);
+      return;
+    }
+    pomoState.running = true;
+    pomoState.paused = false;
+    pomoState.seconds = 25 * 60;
+    var btn3 = document.getElementById('pomoStart');
+    if (btn3) btn3.textContent = t('sb.pomo.pause');
+    var lbl3 = document.getElementById('pomoLabel');
+    if (lbl3) lbl3.textContent = t('sb.pomo.running');
+    pomoState.interval = setInterval(pomoTick, 1000);
+  }
+
+  function pomoTick() {
+    if (pomoState.paused) return;
+    pomoState.seconds--;
+    var el = document.getElementById('pomoTime');
+    if (el) el.textContent = formatPomoTime(pomoState.seconds);
+    if (pomoState.seconds <= 0) {
+      clearInterval(pomoState.interval);
+      pomoState.running = false;
+      pomoState.paused = false;
+      pomoState.seconds = 25 * 60;
+      var el2 = document.getElementById('pomoTime');
+      if (el2) el2.textContent = formatPomoTime(25 * 60);
+      var btn = document.getElementById('pomoStart');
+      if (btn) btn.textContent = t('sb.pomo.start');
+      var lbl = document.getElementById('pomoLabel');
+      if (lbl) lbl.textContent = t('sb.pomo.ready');
+      showToast(t('toast.pomoDone'), 'success');
+    }
+  }
+
+  function pomoReset() {
+    clearInterval(pomoState.interval);
+    pomoState.running = false;
+    pomoState.paused = false;
+    pomoState.seconds = 25 * 60;
+    var el = document.getElementById('pomoTime');
+    if (el) el.textContent = formatPomoTime(25 * 60);
+    var btn = document.getElementById('pomoStart');
+    if (btn) btn.textContent = t('sb.pomo.start');
+    var lbl = document.getElementById('pomoLabel');
+    if (lbl) lbl.textContent = t('sb.pomo.ready');
+  }
+
+  /* ── Confetti ── */
+  function fireConfetti() {
+    var canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    var particles = [];
+    var colors = ['#7c5cff', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+    for (var i = 0; i < 60; i++) {
+      particles.push({
+        x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+        y: window.innerHeight / 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: Math.random() * -14 - 4,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 6 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10,
+        life: 1
+      });
+    }
+    var startTime = performance.now();
+    function animate(now) {
+      var elapsed = (now - startTime) / 1000;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      var alive = false;
+      particles.forEach(function(p) {
+        p.x += p.vx;
+        p.vy += 0.3;
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+        p.life -= 0.012;
+        if (p.life <= 0) return;
+        alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive && elapsed < 2) requestAnimationFrame(animate);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    requestAnimationFrame(animate);
+  }
+
+  /* ── Subtask Helpers ── */
+  function renderSubtaskList(container, subtasks, isEdit) {
+    container.innerHTML = subtasks.map(function(st, i) {
+      return '<div class="subtask-item' + (st.done ? ' done' : '') + '" data-idx="' + i + '">' +
+        '<label class="task-check subtask-check"><input type="checkbox"' + (st.done ? ' checked' : '') + '><span class="checkmark"></span></label>' +
+        '<span class="subtask-text">' + esc(st.text) + '</span>' +
+        '<button class="subtask-del" data-idx="' + i + '">&times;</button>' +
+      '</div>';
+    }).join('');
+    container.querySelectorAll('.subtask-check input').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        var idx = parseInt(cb.closest('.subtask-item').dataset.idx);
+        subtasks[idx].done = cb.checked;
+        cb.closest('.subtask-item').classList.toggle('done', cb.checked);
+      });
+    });
+    container.querySelectorAll('.subtask-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        subtasks.splice(idx, 1);
+        renderSubtaskList(container, subtasks, isEdit);
+      });
+    });
+  }
+
+  function addSubtask(input, container, subtasks) {
+    var val = input.value.trim();
+    if (!val) return;
+    subtasks.push({ text: val, done: false });
+    input.value = '';
+    renderSubtaskList(container, subtasks, false);
+  }
+
   /* ── Edit Modal ── */
   function openEditor(id) {
     var task = todos.find(function (x) { return String(x.id) === String(id); });
     if (!task) return;
     editingId = id;
+    editingSubtasks = (task.subtasks || []).map(function(s) { return { text: s.text, done: s.done }; });
     document.getElementById('editText').value = task.text;
     document.getElementById('editPriority').value = task.priority || 'medium';
     document.getElementById('editDueDate').value = task.dueDate || '';
     document.getElementById('editCategory').value = task.category || '';
     document.getElementById('editTags').value = (task.tags || []).join(', ');
     document.getElementById('editDone').checked = task.done;
+    document.getElementById('editStarred').checked = !!task.starred;
+    document.getElementById('editRecurring').value = task.recurring || '';
+    var editStList = document.getElementById('editSubtaskList');
+    if (editStList) renderSubtaskList(editStList, editingSubtasks, true);
     document.getElementById('editModal').showModal();
     document.getElementById('editText').focus();
   }
@@ -1344,10 +1783,13 @@
     api('PUT', '/tasks/' + editingId, {
       text: document.getElementById('editText').value.trim(),
       done: document.getElementById('editDone').checked,
+      starred: document.getElementById('editStarred').checked,
       priority: document.getElementById('editPriority').value,
       dueDate: document.getElementById('editDueDate').value || null,
       category: document.getElementById('editCategory').value || '',
-      tags: tags
+      tags: tags,
+      recurring: document.getElementById('editRecurring').value || null,
+      subtasks: editingSubtasks
     }).then(function (updated) {
       var idx = todos.findIndex(function (x) { return String(x.id) === String(editingId); });
       if (idx !== -1) todos[idx] = updated;
@@ -1390,6 +1832,70 @@
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
       if (currentRole === 'admin' && authToken) { e.preventDefault(); showPage('adminPage', true); loadAdminUsers(); }
     }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+      var mp2 = document.getElementById('mainPage');
+      if (mp2 && mp2.classList.contains('active')) { e.preventDefault(); toggleSidebar(); }
+    }
+    if (e.key === 'Escape') { closeSidebar(); }
+  });
+
+  /* ── Sidebar Events ── */
+  var sidebarToggleBtn = document.getElementById('sidebarToggle');
+  if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
+  if (sidebarMobileOverlay) sidebarMobileOverlay.addEventListener('click', closeSidebar);
+
+  document.querySelectorAll('.sb-filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.sb-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      filter.quickFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  var sbThemeToggle = document.getElementById('sbThemeToggle');
+  if (sbThemeToggle) sbThemeToggle.addEventListener('click', cycleTheme);
+
+  /* ── Add Category ── */
+  var sbAddCategoryBtn = document.getElementById('sbAddCategory');
+  if (sbAddCategoryBtn) sbAddCategoryBtn.addEventListener('click', function() {
+    var name = prompt(t('sb.catName'));
+    if (!name || !name.trim()) return;
+    var colors = ['#7c5cff', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'];
+    var color = colors[categories.length % colors.length];
+    api('POST', '/categories', { name: name.trim(), color: color }).then(function(cat) {
+      categories.push(cat);
+      renderSidebarCategories();
+      showToast(t('toast.catAdded'), 'success');
+    }).catch(function(err) { showToast(err.message || t('toast.error'), 'error'); });
+  });
+
+  /* ── Pomodoro Events ── */
+  var pomoStartBtn = document.getElementById('pomoStart');
+  var pomoResetBtn = document.getElementById('pomoReset');
+  if (pomoStartBtn) pomoStartBtn.addEventListener('click', pomoStart);
+  if (pomoResetBtn) pomoResetBtn.addEventListener('click', pomoReset);
+
+  /* ── Subtask Events (Task Form) ── */
+  var subtaskInputEl = document.getElementById('subtaskInput');
+  var addSubtaskBtnEl = document.getElementById('addSubtaskBtn');
+  var subtaskListEl = document.getElementById('subtaskList');
+  if (addSubtaskBtnEl) addSubtaskBtnEl.addEventListener('click', function() {
+    if (subtaskInputEl) addSubtask(subtaskInputEl, subtaskListEl, pendingSubtasks);
+  });
+  if (subtaskInputEl) subtaskInputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); addSubtask(subtaskInputEl, subtaskListEl, pendingSubtasks); }
+  });
+
+  /* ── Subtask Events (Edit Modal) ── */
+  var editSubtaskInputEl = document.getElementById('editSubtaskInput');
+  var editAddSubtaskBtnEl = document.getElementById('editAddSubtaskBtn');
+  var editSubtaskListEl = document.getElementById('editSubtaskList');
+  if (editAddSubtaskBtnEl) editAddSubtaskBtnEl.addEventListener('click', function() {
+    if (editSubtaskInputEl && editSubtaskListEl) addSubtask(editSubtaskInputEl, editSubtaskListEl, editingSubtasks);
+  });
+  if (editSubtaskInputEl) editSubtaskInputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); addSubtask(editSubtaskInputEl, editSubtaskListEl, editingSubtasks); }
   });
 
   /* ── Admin ── */
