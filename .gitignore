@@ -21,9 +21,24 @@ npm-debug.log*
 server.log
 server_err.log
 
-# Screenshots (personal, not for repo)
-screenshots/
-
 # Database files
 *.sqlite
 *.sqlite3
+*.db
+
+# Backups
+*.bak
+*.backup
+*.sql
+*.sql.gz
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# Misc
+.env.local
+.env.production
+*.pem
+*.key
