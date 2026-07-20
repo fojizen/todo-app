@@ -398,10 +398,6 @@ html.loading .page{display:none!important}
 [data-theme="light"] .auth-social-btn.github:hover{border-color:rgba(0,0,0,.3);background:rgba(0,0,0,.04)}
 .auth-social-btn.discord{border-color:rgba(88,101,242,.25)}
 .auth-social-btn.discord:hover{border-color:rgba(88,101,242,.5);background:rgba(88,101,242,.06)}
-.auth-social-btn.apple{border-color:rgba(255,255,255,.15)}
-.auth-social-btn.apple:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)}
-[data-theme="light"] .auth-social-btn.apple{border-color:rgba(0,0,0,.15)}
-[data-theme="light"] .auth-social-btn.apple:hover{border-color:rgba(0,0,0,.3);background:rgba(0,0,0,.04)}
 .google-btn-wrap{display:none}
 
 /* ═══════════ MAIN APP ═══════════ */
