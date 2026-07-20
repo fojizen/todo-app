@@ -21,6 +21,14 @@
   <a href="#environment-variables">Environment</a>
 </p>
 
+<p align="center">
+  <img src="screenshots/homepage.png" alt="Homepage" width="350">
+  &nbsp;
+  <img src="screenshots/privacy.png" alt="Privacy Policy" width="350">
+  &nbsp;
+  <img src="screenshots/todo.png" alt="Todo App" width="350">
+</p>
+
 ---
 
 ## Features
@@ -98,18 +106,6 @@
 - Input validation (type, length, format)
 - XSS and SQL injection prevention
 - Double-submit and race condition prevention
-
----
-
-## Screenshots
-
-<p align="center">
-  <img src="screenshots/homepage.png" alt="Homepage" width="350">
-  &nbsp;
-  <img src="screenshots/privacy.png" alt="Privacy Policy" width="350">
-  &nbsp;
-  <img src="screenshots/todo.png" alt="Todo App" width="350">
-</p>
 
 ---
 
