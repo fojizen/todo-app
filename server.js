@@ -26,6 +26,7 @@ if (!process.env.ADMIN_PASSWORD) {
 }
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -104,20 +105,8 @@ app.use((req, res, next) => {
 app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'); res.set('Pragma', 'no-cache'); res.set('Expires', '0'); next(); });
 
 // Static files
-app.get('/', (req, res) => {
-  const fs = require('fs');
-  let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-  html = html.replace('__GOOGLE_CLIENT_ID__', GOOGLE_CLIENT_ID);
-  res.set('Content-Type', 'text/html');
-  res.send(html);
-});
-app.get('/index.html', (req, res) => {
-  const fs = require('fs');
-  let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-  html = html.replace('__GOOGLE_CLIENT_ID__', GOOGLE_CLIENT_ID);
-  res.set('Content-Type', 'text/html');
-  res.send(html);
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/app.js', (req, res) => res.sendFile(path.join(__dirname, 'app.js')));
 app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, 'styles.css')));
 app.get('/favicon.svg', (req, res) => res.sendFile(path.join(__dirname, 'favicon.svg')));
@@ -374,6 +363,43 @@ async function verifyGoogleToken(idToken) {
   if (Number(payload.exp) * 1000 < Date.now()) throw new Error('Token expired');
   return payload;
 }
+
+// ── Google Auth (redirect flow) ─────────────────────────
+app.get('/api/auth/google', (req, res) => {
+  if (!GOOGLE_CLIENT_ID) return res.status(503).json({ error: 'Google giris yapilandirilmamis' });
+  const url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=' + encodeURIComponent(GOOGLE_CLIENT_ID) + '&redirect_uri=' + encodeURIComponent(FRONTEND_URL + '/api/auth/google/callback') + '&response_type=code&scope=openid+email+profile&access_type=offline';
+  res.redirect(url);
+});
+
+app.get('/api/auth/google/callback', async (req, res) => {
+  try {
+    if (!GOOGLE_CLIENT_ID) return res.redirect('/?login=error=' + encodeURIComponent('Google giris yapilandirilmamis'));
+    if (rateLimit('google:' + req.ip, 10, 60000)) return res.redirect('/?login=error=' + encodeURIComponent('Cok fazla istek'));
+    const { code, error: googleError } = req.query;
+    if (googleError || !code) return res.redirect('/?login=error=' + encodeURIComponent('Google dogrulama basarisiz'));
+
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+    if (!GOOGLE_CLIENT_SECRET) return res.redirect('/?login=error=' + encodeURIComponent('Google secret yok'));
+
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, code, grant_type: 'authorization_code', redirect_uri: FRONTEND_URL + '/api/auth/google/callback' })
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.id_token) return res.redirect('/?login=error=' + encodeURIComponent('Google token alinamadi'));
+
+    const google = await verifyGoogleToken(tokenData.id_token);
+    const email = google.email.toLowerCase();
+    const name = google.name || email.split('@')[0];
+
+    const data = await oauthFindOrCreateUser(email, name, 'google');
+    res.redirect('/?login=success&token=' + encodeURIComponent(data.token) + '&username=' + encodeURIComponent(data.username) + '&role=' + encodeURIComponent(data.role));
+  } catch (e) {
+    console.error('Google redirect auth error:', e.message);
+    res.redirect('/?login=error=' + encodeURIComponent('Google giris hatasi'));
+  }
+});
 
 app.post('/api/auth/google', async (req, res) => {
   try {

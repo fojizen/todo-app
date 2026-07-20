@@ -551,7 +551,6 @@
         next.classList.add('active');
         setTimeout(function () { transitioning = false; }, 30);
         if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 30); }
-        if (name === 'loginPage') { setTimeout(renderGoogleButton, 50); }
         if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
         else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
         window.scrollTo(0, 0);
@@ -561,7 +560,6 @@
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition-out'); });
       next.classList.add('active');
       if (name === 'landingPage') { resetHamburgerNav(); setTimeout(updateHeroHeight, 50); }
-      if (name === 'loginPage') { setTimeout(renderGoogleButton, 50); }
       if ((name === 'mainPage' || name === 'landingPage') && !animId) initParticles();
       else if (name !== 'mainPage' && name !== 'landingPage' && animId) { cancelAnimationFrame(animId); animId = null; }
       window.scrollTo(0, 0);
@@ -742,53 +740,6 @@
   var registerTab = document.getElementById('registerTab');
   if (loginTab) loginTab.addEventListener('click', function () { switchTab('login'); });
   if (registerTab) registerTab.addEventListener('click', function () { switchTab('register'); });
-
-  /* Google Sign-In */
-  var googleInited = false;
-  var googleReady = false;
-  function initGoogleSignIn() {
-    if (googleReady) return;
-    if (typeof google === 'undefined' || !google.accounts || !GOOGLE_CLIENT_ID) return;
-    googleReady = true;
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: function (response) {
-        if (!response.credential) return;
-        setBtnLoading(document.getElementById('loginBtn'), true);
-        api('POST', '/auth/google', { credential: response.credential }).then(function (data) {
-          authToken = data.token; currentUser = data.username; currentRole = data.role || 'user';
-          localStorage.setItem('authToken', data.token);
-          updateLandingNav();
-          showToast(t('toast.loginOk'), 'success');
-          loadMain();
-        }).catch(function (err) {
-          showToast(err.message || 'Google giris basarisiz', 'error');
-        }).finally(function () {
-          setBtnLoading(document.getElementById('loginBtn'), false);
-        });
-      }
-    });
-  }
-  function renderGoogleButton() {
-    if (!googleReady) { initGoogleSignIn(); }
-    if (!googleReady) return;
-    var btnEl = document.getElementById('googleSignInBtn');
-    if (!btnEl) return;
-    btnEl.innerHTML = '';
-    google.accounts.id.renderButton(btnEl, {
-      theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_blue',
-      size: 'large',
-      width: 320,
-      text: 'continue_with',
-      shape: 'rectangular'
-    });
-  }
-  function tryInitGoogle(retries) {
-    if (googleReady) return;
-    if (typeof google !== 'undefined' && google.accounts) { initGoogleSignIn(); renderGoogleButton(); return; }
-    if (retries > 0) setTimeout(function () { tryInitGoogle(retries - 1); }, 300);
-  }
-  window.addEventListener('load', function () { tryInitGoogle(10); });
 
   /* Password toggle */
   document.querySelectorAll('.toggle-pw').forEach(function (btn) {
