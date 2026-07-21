@@ -235,10 +235,29 @@ Replace `{provider}` with `google`, `github`, or `discord`.
 
 ---
 
+## SEO
+
+- **Meta tags:** title, description, keywords, canonical, robots
+- **Open Graph:** og:title, og:description, og:image, og:url, og:locale
+- **Twitter Card:** summary_large_image with image
+- **JSON-LD:** SoftwareApplication + Person + WebSite structured data
+- **Cross-linking:** Mutual hreflang links with [Portfolio](https://fojizen.vercel.app)
+- **Sitemap:** `/sitemap.xml` (includes both sites)
+
+---
+
 ## Deployment
 
 - **OnRender:** Backend hosting (auto-sleep prevention via UptimeRobot ping every 5 min)
 - **Supabase:** PostgreSQL database
+
+---
+
+## Related Projects
+
+| Project | Description | Link |
+|---------|-------------|------|
+| **Portfolio** | fojizen personal portfolio — frontend dev, UI/UX design, projects | [Live](https://fojizen.vercel.app) |
 
 ---
 
