@@ -118,7 +118,7 @@ app.get('/manifest.json', (req, res) => res.sendFile(path.join(__dirname, 'manif
 app.get('/sw.js', (req, res) => { res.set('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'sw.js')); });
 app.get('/og-image.svg', (req, res) => res.sendFile(path.join(__dirname, 'og-image.svg')));
 app.get('/sitemap.xml', (req, res) => { res.setHeader('Content-Type', 'application/xml'); res.sendFile(path.join(__dirname, 'sitemap.xml')); });
-app.get('/robots.txt', (req, res) => { res.setHeader('Content-Type', 'text/plain'); res.send('User-agent: *\nAllow: /\nSitemap: https://fojizen-todo-app.onrender.com/sitemap.xml'); });
+app.get('/robots.txt', (req, res) => { res.setHeader('Content-Type', 'text/plain'); res.send('User-agent: *\nAllow: /\nSitemap: https://fojizen-todo-app.onrender.com/sitemap.xml\n\n# Related projects\n# Portfolio: https://fojizen.vercel.app/'); });
 
 app.get('/api/health', (req, res) => res.json({ ok: true, uptime: process.uptime() }));
 
