@@ -1,4 +1,4 @@
-name: Keep Alive
+name: Supabase Keep Alive
 
 on:
   schedule:
@@ -6,8 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  ping:
+  keep-alive:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Ping health endpoint
-        run: curl -f https://fojizen-todo-app.onrender.com/api/health
+      - name: Ping Supabase database
+        run: |
+          curl -f "${{ secrets.SUPABASE_URL }}/rest/v1/keep_alive?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
